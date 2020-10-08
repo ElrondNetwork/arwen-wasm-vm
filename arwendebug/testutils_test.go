@@ -111,7 +111,7 @@ func (context *testContext) runContract(contract string, impersonated string, fu
 		ArgumentsHex:       arguments,
 	}
 
-	response, err := context.facade.RunSmartContract(request)
+	response, err := context.facade.CallSmartContract(request)
 
 	t := context.t
 	require.Nil(t, err)
@@ -150,7 +150,7 @@ func (context *testContext) queryContract(contract string, impersonated string, 
 }
 
 func (response *ContractResponseBase) getFirstResultAsInt64() int64 {
-	result, err := response.Output.GetFirstReturnData(vmcommon.AsBigInt)
+	result, err := response.Output.ConvertToVMOutput().GetFirstReturnData(vmcommon.AsBigInt)
 	if err != nil {
 		return 0
 	}

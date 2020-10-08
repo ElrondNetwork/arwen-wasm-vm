@@ -6,46 +6,49 @@ import (
 	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 )
 
+// SerializableVMOutput is a serialize-friendly structure resembling a VMOutput
 type SerializableVMOutput struct {
-	ReturnData              [][]byte
-	ReturnCode              vmcommon.ReturnCode
-	ReturnMessage           string
-	GasRemaining            uint64
-	GasRefund               *big.Int
-	CorrectedOutputAccounts []*SerializableOutputAccount
-	DeletedAccounts         [][]byte
-	TouchedAccounts         [][]byte
-	Logs                    []*vmcommon.LogEntry
+	ReturnData      [][]byte
+	ReturnCode      vmcommon.ReturnCode
+	ReturnMessage   string
+	GasRemaining    uint64
+	GasRefund       *big.Int
+	OutputAccounts  []*SerializableOutputAccount
+	DeletedAccounts [][]byte
+	TouchedAccounts [][]byte
+	Logs            []*vmcommon.LogEntry
 }
 
+// NewSerializableVMOutput creates a new SerializableVMOutput
 func NewSerializableVMOutput(vmOutput *vmcommon.VMOutput) *SerializableVMOutput {
 	if vmOutput == nil {
 		return &SerializableVMOutput{}
 	}
 
 	o := &SerializableVMOutput{
-		ReturnData:              vmOutput.ReturnData,
-		ReturnCode:              vmOutput.ReturnCode,
-		ReturnMessage:           vmOutput.ReturnMessage,
-		GasRemaining:            vmOutput.GasRemaining,
-		GasRefund:               vmOutput.GasRefund,
-		CorrectedOutputAccounts: make([]*SerializableOutputAccount, 0, len(vmOutput.OutputAccounts)),
-		DeletedAccounts:         vmOutput.DeletedAccounts,
-		TouchedAccounts:         vmOutput.TouchedAccounts,
-		Logs:                    vmOutput.Logs,
+		ReturnData:      vmOutput.ReturnData,
+		ReturnCode:      vmOutput.ReturnCode,
+		ReturnMessage:   vmOutput.ReturnMessage,
+		GasRemaining:    vmOutput.GasRemaining,
+		GasRefund:       vmOutput.GasRefund,
+		OutputAccounts:  make([]*SerializableOutputAccount, 0, len(vmOutput.OutputAccounts)),
+		DeletedAccounts: vmOutput.DeletedAccounts,
+		TouchedAccounts: vmOutput.TouchedAccounts,
+		Logs:            vmOutput.Logs,
 	}
 
 	for _, account := range vmOutput.OutputAccounts {
-		o.CorrectedOutputAccounts = append(o.CorrectedOutputAccounts, NewSerializableOutputAccount(account))
+		o.OutputAccounts = append(o.OutputAccounts, NewSerializableOutputAccount(account))
 	}
 
 	return o
 }
 
+// ConvertToVMOutput converts a SerializableVMOutput to a VMOutput
 func (o *SerializableVMOutput) ConvertToVMOutput() *vmcommon.VMOutput {
 	accountsMap := make(map[string]*vmcommon.OutputAccount)
 
-	for _, item := range o.CorrectedOutputAccounts {
+	for _, item := range o.OutputAccounts {
 		accountsMap[string(item.Address)] = item.ConvertToOutputAccount()
 	}
 
@@ -62,6 +65,7 @@ func (o *SerializableVMOutput) ConvertToVMOutput() *vmcommon.VMOutput {
 	}
 }
 
+// SerializableOutputAccount is a serialize-friendly structure resembling an OutputAccount
 type SerializableOutputAccount struct {
 	Address             []byte
 	Nonce               uint64
@@ -75,6 +79,7 @@ type SerializableOutputAccount struct {
 	CodeDeployerAddress []byte
 }
 
+// SerializableOutputTransfer is a serialize-friendly structure resembling an OutputTransfer
 type SerializableOutputTransfer struct {
 	Value    *big.Int
 	Data     []byte
@@ -82,6 +87,7 @@ type SerializableOutputTransfer struct {
 	CallType vmcommon.CallType
 }
 
+// NewSerializableOutputAccount creates a new SerializableOutputAccount
 func NewSerializableOutputAccount(account *vmcommon.OutputAccount) *SerializableOutputAccount {
 	a := &SerializableOutputAccount{
 		Address:             account.Address,
@@ -113,6 +119,7 @@ func NewSerializableOutputAccount(account *vmcommon.OutputAccount) *Serializable
 	return a
 }
 
+// ConvertToOutputAccount converts a SerializableOutputAccount to an OutputAccount
 func (a *SerializableOutputAccount) ConvertToOutputAccount() *vmcommon.OutputAccount {
 	updatesMap := make(map[string]*vmcommon.StorageUpdate)
 

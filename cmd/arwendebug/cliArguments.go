@@ -68,7 +68,7 @@ func (args *cliArguments) toUpgradeRequest() arwendebug.UpgradeRequest {
 	return *request
 }
 
-func (args *cliArguments) toRunRequest() arwendebug.RunRequest {
+func (args *cliArguments) toCallRequest() arwendebug.RunRequest {
 	request := &arwendebug.RunRequest{}
 	args.populateRunRequest(request)
 

@@ -85,9 +85,9 @@ func (f *DebugFacade) UpgradeSmartContract(request UpgradeRequest) (*UpgradeResp
 	return response, err
 }
 
-// RunSmartContract executes a smart contract function
-func (f *DebugFacade) RunSmartContract(request RunRequest) (*RunResponse, error) {
-	log.Debug("Debugf.RunSmartContract()")
+// CallSmartContract executes a smart contract function
+func (f *DebugFacade) CallSmartContract(request RunRequest) (*RunResponse, error) {
+	log.Debug("Debugf.CallSmartContract()")
 
 	err := request.digest()
 	if err != nil {
@@ -100,7 +100,7 @@ func (f *DebugFacade) RunSmartContract(request RunRequest) (*RunResponse, error)
 		return nil, err
 	}
 
-	response := world.runSmartContract(request)
+	response := world.callSmartContract(request)
 
 	err = database.storeWorld(world)
 	if err != nil {

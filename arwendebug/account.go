@@ -12,6 +12,7 @@ type Account struct {
 	AddressHex      string
 	Nonce           uint64
 	Balance         *big.Int
+	BalanceString   string
 	CodeHex         string
 	CodeMetadataHex string
 	OwnerAddressHex string
@@ -27,11 +28,12 @@ func NewAccount(address []byte, nonce uint64, balance *big.Int) *Account {
 	}
 
 	return &Account{
-		AddressHex: toHex(address),
-		Nonce:      nonce,
-		Balance:    balance,
-		CodeHex:    "",
-		Storage:    make(map[string]string),
+		AddressHex:    toHex(address),
+		Nonce:         nonce,
+		Balance:       balance,
+		BalanceString: balance.String(),
+		CodeHex:       "",
+		Storage:       make(map[string]string),
 	}
 }
 
@@ -83,7 +85,7 @@ func (a *Account) GetOwnerAddress() []byte {
 	return fromHexNoError(a.OwnerAddressHex)
 }
 
-// GetOwnerAddress -
+// GetUserName -
 func (a *Account) GetUserName() []byte {
 	return fromHexNoError(a.UserNameHex)
 }

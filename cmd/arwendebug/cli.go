@@ -179,10 +179,10 @@ func initializeCLI(facade *arwendebug.DebugFacade) *cli.App {
 			},
 		},
 		{
-			Name:        "run",
-			Description: "run smart contract",
+			Name:        "call",
+			Description: "call smart contract",
 			Action: func(context *cli.Context) error {
-				_, err := facade.RunSmartContract(args.toRunRequest())
+				_, err := facade.CallSmartContract(args.toCallRequest())
 				return err
 			},
 			Flags: []cli.Flag{

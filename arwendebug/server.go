@@ -99,7 +99,7 @@ func (server *DebugServer) handleRun(ginContext *gin.Context) {
 		return
 	}
 
-	response, err := server.facade.RunSmartContract(request)
+	response, err := server.facade.CallSmartContract(request)
 	if err != nil {
 		returnBadRequest(ginContext, "handleRun.UpgradeSmartContract", err)
 		return

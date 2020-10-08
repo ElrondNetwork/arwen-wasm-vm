@@ -3,6 +3,7 @@ package arwendebug
 import (
 	"math/big"
 
+	"github.com/ElrondNetwork/arwen-wasm-vm/ipc/common"
 	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 )
 
@@ -76,14 +77,14 @@ func (request *ContractRequestBase) digest() error {
 type ContractResponseBase struct {
 	ResponseBase
 	Input            *vmcommon.VMInput
-	Output           *vmcommon.VMOutput
+	Output           *common.SerializableVMOutput
 	ReturnCodeString string
 }
 
 func createContractResponseBase(input *vmcommon.VMInput, output *vmcommon.VMOutput) ContractResponseBase {
 	response := ContractResponseBase{
 		Input:  input,
-		Output: output,
+		Output: common.NewSerializableVMOutput(output),
 	}
 
 	if output != nil {

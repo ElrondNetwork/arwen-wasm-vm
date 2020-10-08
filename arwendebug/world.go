@@ -87,9 +87,9 @@ func (w *world) upgradeSmartContract(request UpgradeRequest) *UpgradeResponse {
 	return response
 }
 
-func (w *world) runSmartContract(request RunRequest) *RunResponse {
+func (w *world) callSmartContract(request RunRequest) *RunResponse {
 	input := w.prepareCallInput(request)
-	log.Trace("w.runSmartContract()", "input", prettyJson(input))
+	log.Trace("w.callSmartContract()", "input", prettyJson(input))
 
 	vmOutput, err := w.vm.RunSmartContractCall(input)
 	if err == nil {
