@@ -7,7 +7,10 @@ import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/ipc/arwenpart"
 	"github.com/ElrondNetwork/arwen-wasm-vm/ipc/common"
 	"github.com/ElrondNetwork/arwen-wasm-vm/ipc/marshaling"
-	"github.com/ElrondNetwork/elrond-go-logger/pipes"
+	logger "github.com/ElrondNetwork/elrond-go-logger"
+	nodeConfig "github.com/ElrondNetwork/elrond-go/config"
+	"github.com/ElrondNetwork/elrond-go/core"
+	"github.com/ElrondNetwork/elrond-go/health"
 )
 
 const (
@@ -30,6 +33,8 @@ func main() {
 
 // doMain returns (error code, error message)
 func doMain() (int, string) {
+	startHealthService()
+
 	arwenInitFile := getPipeFile(fileDescriptorArwenInit)
 	if arwenInitFile == nil {
 		return common.ErrCodeCannotCreateFile, "Cannot get pipe file: [arwenInitFile]"
@@ -45,35 +50,17 @@ func doMain() (int, string) {
 		return common.ErrCodeCannotCreateFile, "Cannot get pipe file: [arwenToNodeFile]"
 	}
 
-	readLogProfileFile := getPipeFile(fileDescriptorReadLogProfile)
-	if readLogProfileFile == nil {
-		return common.ErrCodeCannotCreateFile, "Cannot get pipe file: [readLogProfileFile]"
-	}
-
-	logToNodeFile := getPipeFile(fileDescriptorLogToNode)
-	if logToNodeFile == nil {
-		return common.ErrCodeCannotCreateFile, "Cannot get pipe file: [logToNodeFile]"
-	}
-
 	arwenArguments, err := common.GetArwenArguments(arwenInitFile)
 	if err != nil {
 		return common.ErrCodeInit, fmt.Sprintf("Cannot receive gasSchedule: %v", err)
 	}
 
+	err = startLogging()
+	if err != nil {
+		return common.ErrCodeInit, fmt.Sprintf("Cannot initialize logging: %v", err)
+	}
+
 	messagesMarshalizer := marshaling.CreateMarshalizer(arwenArguments.MessagesMarshalizer)
-	logsMarshalizer := marshaling.CreateMarshalizer(arwenArguments.LogsMarshalizer)
-
-	logsPart, err := pipes.NewChildPart(readLogProfileFile, logToNodeFile, logsMarshalizer)
-	if err != nil {
-		return common.ErrCodeInit, fmt.Sprintf("Cannot create logs part: %v", err)
-	}
-
-	err = logsPart.StartLoop()
-	if err != nil {
-		return common.ErrCodeInit, fmt.Sprintf("Cannot start logs loop: %v", err)
-	}
-
-	defer logsPart.StopLoop()
 
 	part, err := arwenpart.NewArwenPart(
 		appVersion,
@@ -95,7 +82,48 @@ func doMain() (int, string) {
 	return common.ErrCodeSuccess, ""
 }
 
+func startHealthService() {
+	healthService := health.NewHealthService(nodeConfig.HealthServiceConfig{
+		IntervalVerifyMemoryInSeconds:             5,
+		IntervalDiagnoseComponentsInSeconds:       60,
+		IntervalDiagnoseComponentsDeeplyInSeconds: 60,
+		MemoryUsageToCreateProfiles:               1 * 1024 * 1024,
+		NumMemoryUsageRecordsToKeep:               100,
+		FolderPath:                                "health-records",
+	}, getWorkingDirectory())
+
+	healthService.Start()
+}
+
+func getWorkingDirectory() string {
+	workingDirectory := fmt.Sprintf("arwen_%d", os.Getpid())
+	os.MkdirAll(workingDirectory, os.ModePerm)
+	return workingDirectory
+}
+
 func getPipeFile(fileDescriptor uintptr) *os.File {
 	file := os.NewFile(fileDescriptor, fmt.Sprintf("/proc/self/fd/%d", fileDescriptor))
 	return file
+}
+
+func startLogging() error {
+	logsFile, err := core.CreateFile(
+		core.ArgCreateFileArgument{
+			Prefix:        "logviewer",
+			Directory:     getWorkingDirectory(),
+			FileExtension: "log",
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	err = logger.AddLogObserver(logsFile, &logger.PlainFormatter{})
+	if err != nil {
+		return err
+	}
+
+	logger.SetLogLevel("*:TRACE")
+
+	return nil
 }
