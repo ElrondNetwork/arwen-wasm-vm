@@ -31,7 +31,7 @@ func MakeAPIImports() *wasmer.Imports {
 
 func InitializeArwenAndWasmer() *contextmock.VMHostMock {
 	imports := MakeAPIImports()
-	_ = wasmer.SetImports(imports)
+	_ = wasmer.SetImports(imports, 0)
 
 	gasSchedule := config.MakeGasMapForTests()
 	gasCostConfig, _ := config.CreateGasConfig(gasSchedule)

@@ -129,6 +129,7 @@ func (context *runtimeContext) makeInstanceFromCompiledCode(codeHash []byte, gas
 		OpcodeTrace:        false,
 		Metering:           true,
 		RuntimeBreakpoints: true,
+		ImportObjectIndex:  context.host.Index(),
 	}
 	newInstance, err := context.instanceBuilder.NewInstanceFromCompiledCodeWithOptions(compiledCode, options)
 	if err != nil {
@@ -177,6 +178,7 @@ func (context *runtimeContext) makeInstanceFromContractByteCode(contract []byte,
 		OpcodeTrace:        false,
 		Metering:           true,
 		RuntimeBreakpoints: true,
+		ImportObjectIndex:  context.host.Index(),
 	}
 	newInstance, err := context.instanceBuilder.NewInstanceWithOptions(contract, options)
 	if err != nil {

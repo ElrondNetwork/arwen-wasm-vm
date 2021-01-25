@@ -1,6 +1,7 @@
 package arwen
 
 import (
+	"sync"
 	"unsafe"
 
 	"github.com/ElrondNetwork/arwen-wasm-vm/crypto"
@@ -35,8 +36,13 @@ var (
 	vmContextMap     map[uint8]VMHost
 )
 
+var vmContextMapMutex = sync.Mutex{}
+
 // AddHostContext adds the given context to the context map, and returns the context id
 func AddHostContext(ctx VMHost) int {
+	vmContextMapMutex.Lock()
+	defer vmContextMapMutex.Unlock()
+
 	id := vmContextCounter
 	vmContextCounter++
 	if vmContextMap == nil {
@@ -48,16 +54,23 @@ func AddHostContext(ctx VMHost) int {
 
 // RemoveAllHostContexts reinitializes the vm context map
 func RemoveAllHostContexts() {
+	vmContextMapMutex.Lock()
+	defer vmContextMapMutex.Unlock()
 	vmContextMap = make(map[uint8]VMHost)
 }
 
 // RemoveHostContext deletes the context at the given id from the map
 func RemoveHostContext(idx int) {
+	vmContextMapMutex.Lock()
+	defer vmContextMapMutex.Unlock()
 	delete(vmContextMap, uint8(idx))
 }
 
 // GetVMContext returns the vm Context from the vm context map
 func GetVMContext(context unsafe.Pointer) VMHost {
+	vmContextMapMutex.Lock()
+	defer vmContextMapMutex.Unlock()
+
 	instCtx := wasmer.IntoInstanceContext(context)
 	var idx = *(*int)(instCtx.Data())
 

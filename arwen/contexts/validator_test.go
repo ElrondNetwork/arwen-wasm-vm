@@ -55,6 +55,7 @@ func TestFunctionsGuard_Arity(t *testing.T) {
 		OpcodeTrace:        false,
 		Metering:           true,
 		RuntimeBreakpoints: true,
+		ImportObjectIndex:  0,
 	}
 	instance, err := wasmer.NewInstanceWithOptions(contractCode, options)
 	require.Nil(t, err)

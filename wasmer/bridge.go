@@ -118,14 +118,20 @@ func cWasmerInstanceFromCache(
 	))
 }
 
-func cWasmerCacheImportObjectFromImports(
+func cWasmerCacheImportObjectSet(
 	imports *cWasmerImportT,
 	importsLength cInt,
+	index uint64,
 ) cWasmerResultT {
-	return (cWasmerResultT)(C.wasmer_import_object_cache_from_imports(
+	return (cWasmerResultT)(C.wasmer_import_object_set(
 		(*C.wasmer_import_t)(imports),
 		(C.uint32_t)(importsLength),
+		(C.uint64_t)(index),
 	))
+}
+
+func cWasmerImportObjectNewIndex() uint64 {
+	return uint64(C.wasmer_import_object_new_index())
 }
 
 func cWasmerSetOpcodeCosts(opcode_costs *[OPCODE_COUNT]uint32) {

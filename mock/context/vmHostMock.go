@@ -27,6 +27,11 @@ type VMHostMock struct {
 	IsBuiltinFunc bool
 }
 
+// Index mocked method
+func (host *VMHostMock) Index() uint64 {
+	return 0
+}
+
 // Crypto mocked method
 func (host *VMHostMock) Crypto() crypto.VMCrypto {
 	return host.CryptoHook

@@ -16,6 +16,7 @@ type VMHostStub struct {
 	PopStateCalled        func()
 	ClearStateStackCalled func()
 
+	IndexCalled                       func() uint64
 	CryptoCalled                      func() crypto.VMCrypto
 	BlockchainCalled                  func() arwen.BlockchainContext
 	RuntimeCalled                     func() arwen.RuntimeContext
@@ -30,6 +31,14 @@ type VMHostStub struct {
 	GetProtocolBuiltinFunctionsCalled func() vmcommon.FunctionNames
 	IsBuiltinFunctionNameCalled       func(functionName string) bool
 	AreInSameShardCalled              func(left []byte, right []byte) bool
+}
+
+// Index mocked method
+func (vhs *VMHostStub) Index() uint64 {
+	if vhs.IndexCalled != nil {
+		return vhs.Index()
+	}
+	return 0
 }
 
 // InitState mocked method

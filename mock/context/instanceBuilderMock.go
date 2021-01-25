@@ -39,6 +39,7 @@ func (builder *InstanceBuilderMock) CreateAndStoreInstanceMock(code []byte) wasm
 		OpcodeTrace:        false,
 		Metering:           true,
 		RuntimeBreakpoints: true,
+		ImportObjectIndex:  0,
 	}
 
 	instance, err := wasmer.NewInstanceWithOptions(builder.DefaultCode, options)
