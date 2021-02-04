@@ -10,7 +10,6 @@ type StubAccount struct {
 	Address      []byte
 	Nonce        uint64
 	Balance      *big.Int
-	Code         []byte
 	CodeHash     []byte
 	CodeMetadata []byte
 	OwnerAddress []byte
@@ -29,11 +28,6 @@ func (a *StubAccount) AddressBytes() []byte {
 // GetNonce -
 func (a *StubAccount) GetNonce() uint64 {
 	return a.Nonce
-}
-
-// GetCode -
-func (a *StubAccount) GetCode() []byte {
-	return a.Code
 }
 
 // GetCodeMetadata -

@@ -135,7 +135,7 @@ func TestRuntimeContext_StateSettersAndGetters(t *testing.T) {
 		Function:      "test function",
 	}
 
-	runtimeContext.InitStateFromInput(callInput)
+	runtimeContext.InitStateFromContractCallInput(callInput)
 	require.Equal(t, []byte("caller"), runtimeContext.GetVMInput().CallerAddr)
 	require.Equal(t, []byte("recipient"), runtimeContext.GetSCAddress())
 	require.Equal(t, "test function", runtimeContext.Function())
@@ -205,7 +205,7 @@ func TestRuntimeContext_PushPopState(t *testing.T) {
 		RecipientAddr: scAddress,
 		Function:      funcName,
 	}
-	runtimeContext.InitStateFromInput(input)
+	runtimeContext.InitStateFromContractCallInput(input)
 
 	runtimeContext.PushState()
 	require.Equal(t, 1, len(runtimeContext.stateStack))
@@ -266,14 +266,14 @@ func TestRuntimeContext_Instance(t *testing.T) {
 		RecipientAddr: []byte("addr"),
 		Function:      funcName,
 	}
-	runtimeContext.InitStateFromInput(input)
+	runtimeContext.InitStateFromContractCallInput(input)
 
 	f, err := runtimeContext.GetFunctionToCall()
 	require.Nil(t, err)
 	require.NotNil(t, f)
 
 	input.Function = "func"
-	runtimeContext.InitStateFromInput(input)
+	runtimeContext.InitStateFromContractCallInput(input)
 	f, err = runtimeContext.GetFunctionToCall()
 	require.Equal(t, arwen.ErrFuncNotFound, err)
 	require.Nil(t, f)
@@ -359,7 +359,7 @@ func TestRuntimeContext_MemLoadStoreOk(t *testing.T) {
 	err := runtimeContext.StartWasmerInstance(contractCode, gasLimit, false)
 	require.Nil(t, err)
 
-	memory := runtimeContext.instance.Memory
+	memory := runtimeContext.instance.GetMemory()
 
 	memContents, err := runtimeContext.MemLoad(10, 10)
 	require.Nil(t, err)
@@ -391,7 +391,7 @@ func TestRuntimeContext_MemoryIsBlank(t *testing.T) {
 	err := runtimeContext.StartWasmerInstance(contractCode, gasLimit, false)
 	require.Nil(t, err)
 
-	memory := runtimeContext.instance.Memory
+	memory := runtimeContext.instance.GetMemory()
 	err = memory.Grow(30)
 	require.Nil(t, err)
 
@@ -421,7 +421,7 @@ func TestRuntimeContext_MemLoadCases(t *testing.T) {
 	err := runtimeContext.StartWasmerInstance(contractCode, gasLimit, false)
 	require.Nil(t, err)
 
-	memory := runtimeContext.instance.Memory
+	memory := runtimeContext.instance.GetMemory()
 
 	var offset int32
 	var length int32
@@ -486,7 +486,7 @@ func TestRuntimeContext_MemStoreCases(t *testing.T) {
 	require.Nil(t, err)
 
 	pageSize := uint32(65536)
-	memory := runtimeContext.instance.Memory
+	memory := runtimeContext.instance.GetMemory()
 	require.Equal(t, 2*pageSize, memory.Length())
 
 	// Bad lower bounds

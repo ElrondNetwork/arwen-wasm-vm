@@ -53,6 +53,8 @@ const (
 	BlockchainGetAllStateResponse
 	BlockchainGetUserAccountRequest
 	BlockchainGetUserAccountResponse
+	BlockchainGetCodeRequest
+	BlockchainGetCodeResponse
 	BlockchainGetShardOfAddressRequest
 	BlockchainGetShardOfAddressResponse
 	BlockchainIsPayableRequest
@@ -118,6 +120,8 @@ func init() {
 	messageKindNameByID[BlockchainGetAllStateResponse] = "BlockchainGetAllStateResponse"
 	messageKindNameByID[BlockchainGetUserAccountRequest] = "BlockchainGetUserAccountRequest"
 	messageKindNameByID[BlockchainGetUserAccountResponse] = "BlockchainGetUserAccountResponse"
+	messageKindNameByID[BlockchainGetCodeRequest] = "BlockchainGetCodeRequest"
+	messageKindNameByID[BlockchainGetCodeResponse] = "BlockchainGetCodeResponse"
 	messageKindNameByID[BlockchainGetShardOfAddressRequest] = "BlockchainGetShardOfAddressRequest"
 	messageKindNameByID[BlockchainGetShardOfAddressResponse] = "BlockchainGetShardOfAddressResponse"
 	messageKindNameByID[BlockchainIsSmartContractRequest] = "BlockchainIsSmartContractRequest"

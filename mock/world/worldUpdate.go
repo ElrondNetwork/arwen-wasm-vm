@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/big"
 
+	"github.com/ElrondNetwork/arwen-wasm-vm/crypto/hashing"
 	"github.com/ElrondNetwork/elrond-go/core/vmcommon"
 )
 
@@ -79,6 +80,8 @@ func (b *MockWorld) UpdateAccounts(
 		}
 		if len(modAcct.Code) > 0 {
 			acct.Code = modAcct.Code
+			hasher := hashing.NewHasher()
+			acct.CodeHash, _ = hasher.Sha256(acct.Code)
 		}
 		if len(modAcct.OutputTransfers) > 0 && len(modAcct.OutputTransfers[0].Data) > 0 {
 			acct.AsyncCallData = string(modAcct.OutputTransfers[0].Data)

@@ -31,6 +31,7 @@ type BlockchainHookStub struct {
 	IsPayableCalled               func(address []byte) (bool, error)
 	GetCompiledCodeCalled         func(codeHash []byte) (bool, []byte)
 	SaveCompiledCodeCalled        func(codeHash []byte, code []byte)
+	GetCodeCalled                 func(account vmcommon.UserAccountHandler) []byte
 }
 
 // NewAddress mocked method
@@ -175,6 +176,14 @@ func (b *BlockchainHookStub) GetUserAccount(address []byte) (vmcommon.UserAccoun
 		return b.GetUserAccountCalled(address)
 	}
 	return nil, nil
+}
+
+// GetCode mocked method
+func (b *BlockchainHookStub) GetCode(account vmcommon.UserAccountHandler) []byte {
+	if b.GetCodeCalled != nil {
+		return b.GetCodeCalled(account)
+	}
+	return nil
 }
 
 // GetShardOfAddress mocked method

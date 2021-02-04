@@ -9,6 +9,7 @@ type BaseOperationCost struct {
 	PersistPerByte    uint64
 	CompilePerByte    uint64
 	AoTPreparePerByte uint64
+	GetCode           uint64
 }
 
 type ElrondAPICost struct {

@@ -194,6 +194,16 @@ func (b *MockWorld) GetUserAccount(address []byte) (vmcommon.UserAccountHandler,
 	return account, nil
 }
 
+// GetCode retrieves the code from the given account, or nil if not found
+func (b *MockWorld) GetCode(acc vmcommon.UserAccountHandler) []byte {
+	account := b.AcctMap.GetAccount(acc.AddressBytes())
+	if account == nil {
+		return nil
+	}
+
+	return account.Code
+}
+
 // GetShardOfAddress -
 func (b *MockWorld) GetShardOfAddress(address []byte) uint32 {
 	account := b.AcctMap.GetAccount(address)

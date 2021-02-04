@@ -124,7 +124,6 @@ func (part *NodePart) replyToBlockchainGetUserAccount(request common.MessageHand
 		Nonce:           account.GetNonce(),
 		Address:         account.AddressBytes(),
 		Balance:         account.GetBalance(),
-		Code:            account.GetCode(),
 		CodeMetadata:    account.GetCodeMetadata(),
 		CodeHash:        account.GetCodeHash(),
 		RootHash:        account.GetRootHash(),
@@ -132,6 +131,13 @@ func (part *NodePart) replyToBlockchainGetUserAccount(request common.MessageHand
 		OwnerAddress:    account.GetOwnerAddress(),
 		UserName:        account.GetUserName(),
 	}, err)
+}
+
+func (part *NodePart) replyToBlockchainGetCode(request common.MessageHandler) common.MessageHandler {
+	typedRequest := request.(*common.MessageBlockchainGetCodeRequest)
+	code := part.blockchain.GetCode(typedRequest.Account)
+
+	return common.NewMessageBlockchainGetCodeResponse(code)
 }
 
 func (part *NodePart) replyToBlockchainGetShardOfAddress(request common.MessageHandler) common.MessageHandler {

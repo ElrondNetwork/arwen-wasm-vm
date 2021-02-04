@@ -119,7 +119,7 @@ func TestAsyncContext_InitState(t *testing.T) {
 	require.Empty(t, async.asyncCallGroups)
 }
 
-func TestAsyncContext_InitStateFromInput(t *testing.T) {
+func TestAsyncContext_InitStateFromContractCallInput(t *testing.T) {
 	host, _ := InitializeArwenAndWasmer_AsyncContext()
 	async := NewAsyncContext(host)
 	require.NotNil(t, async)
@@ -285,12 +285,14 @@ func TestAsyncContext_DetermineExecutionMode(t *testing.T) {
 	leftAddress := []byte("left")
 	leftAccount := &worldmock.Account{
 		Address: leftAddress,
+		Code:    []byte("left code"),
 		ShardID: 0,
 	}
 
 	rightAddress := []byte("right")
 	rightAccount := &worldmock.Account{
 		Address: rightAddress,
+		Code:    []byte("right code"),
 		ShardID: 0,
 	}
 
@@ -318,21 +320,33 @@ func TestAsyncContext_DetermineExecutionMode(t *testing.T) {
 	runtime.SetSCAddress(leftAddress)
 	execMode, err = async.determineExecutionMode(rightAddress, []byte("func"))
 	require.Nil(t, err)
-	require.Equal(t, arwen.SyncExecution, execMode)
+	require.Equal(t, arwen.AsyncBuiltinFuncIntraShard, execMode)
 
 	host.IsBuiltinFunc = false
+	rightAccount.Code = []byte{}
 	rightAccount.ShardID = 1
+
+	// Erase the code of the rightAccount from the Output context cache
+	outputAccount, _ := host.Output().GetOutputAccount(rightAddress)
+	outputAccount.Code = []byte{}
+
 	runtime.SetSCAddress(leftAddress)
 	execMode, err = async.determineExecutionMode(rightAddress, []byte("func"))
 	require.Nil(t, err)
 	require.Equal(t, arwen.AsyncUnknown, execMode)
 
 	host.IsBuiltinFunc = true
+	rightAccount.Code = []byte{}
 	rightAccount.ShardID = 1
+
+	// Erase the code of the rightAccount from the Output context cache
+	outputAccount, _ = host.Output().GetOutputAccount(rightAddress)
+	outputAccount.Code = []byte{}
+
 	runtime.SetSCAddress(leftAddress)
 	execMode, err = async.determineExecutionMode(rightAddress, []byte("func"))
 	require.Nil(t, err)
-	require.Equal(t, arwen.AsyncBuiltinFunc, execMode)
+	require.Equal(t, arwen.AsyncBuiltinFuncCrossShard, execMode)
 }
 
 func TestAsyncContext_IsValidCallbackName(t *testing.T) {
@@ -424,14 +438,14 @@ func TestAsyncContext_UpdateCurrentCallStatus(t *testing.T) {
 	async := NewAsyncContext(host)
 
 	// CallType == DirectCall, async.UpdateCurrentCallStatus() does nothing
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err := async.UpdateCurrentCallStatus()
 	require.Nil(t, asyncCall)
 	require.Nil(t, err)
 
 	// CallType == AsynchronousCall, async.UpdateCurrentCallStatus() does nothing
 	vmInput.CallType = vmcommon.AsynchronousCall
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err = async.UpdateCurrentCallStatus()
 	require.Nil(t, asyncCall)
 	require.Nil(t, err)
@@ -440,7 +454,7 @@ func TestAsyncContext_UpdateCurrentCallStatus(t *testing.T) {
 	// AsyncContext, so async.UpdateCurrentCallStatus() returns an error
 	vmInput.CallType = vmcommon.AsynchronousCallBack
 	vmInput.Arguments = nil
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err = async.UpdateCurrentCallStatus()
 	require.Nil(t, asyncCall)
 	require.True(t, errors.Is(err, arwen.ErrCannotInterpretCallbackArgs))
@@ -449,7 +463,7 @@ func TestAsyncContext_UpdateCurrentCallStatus(t *testing.T) {
 	// AsyncContext, so async.UpdateCurrentCallStatus() returns an error
 	vmInput.CallType = vmcommon.AsynchronousCallBack
 	vmInput.Arguments = [][]byte{{0}}
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err = async.UpdateCurrentCallStatus()
 	require.Nil(t, asyncCall)
 	require.True(t, errors.Is(err, arwen.ErrAsyncCallNotFound))
@@ -464,7 +478,7 @@ func TestAsyncContext_UpdateCurrentCallStatus(t *testing.T) {
 
 	vmInput.CallType = vmcommon.AsynchronousCallBack
 	vmInput.Arguments = [][]byte{{0}}
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err = async.UpdateCurrentCallStatus()
 	require.Nil(t, asyncCall)
 	require.True(t, errors.Is(err, arwen.ErrAsyncCallNotFound))
@@ -479,7 +493,7 @@ func TestAsyncContext_UpdateCurrentCallStatus(t *testing.T) {
 
 	vmInput.CallType = vmcommon.AsynchronousCallBack
 	vmInput.Arguments = [][]byte{{0}}
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err = async.UpdateCurrentCallStatus()
 	require.Nil(t, err)
 	require.NotNil(t, asyncCall)
@@ -490,7 +504,7 @@ func TestAsyncContext_UpdateCurrentCallStatus(t *testing.T) {
 	// AsyncCall, but with AsyncCallRejected
 	vmInput.CallType = vmcommon.AsynchronousCallBack
 	vmInput.Arguments = [][]byte{{1}}
-	host.Runtime().InitStateFromInput(vmInput)
+	host.Runtime().InitStateFromContractCallInput(vmInput)
 	asyncCall, err = async.UpdateCurrentCallStatus()
 	require.Nil(t, err)
 	require.NotNil(t, asyncCall)
@@ -515,17 +529,25 @@ func TestAsyncContext_SendAsyncCallCrossShard(t *testing.T) {
 		Data:        []byte("some_data"),
 	}
 
+	host.Runtime().GetVMInput().GasProvided = 200
 	err := async.sendAsyncCallCrossShard(asyncCall)
 	require.Nil(t, err)
 
+	mockMetering := host.Metering().(*contextmock.MeteringContextMock)
+	mockMetering.GasProvidedMock = 200
+	mockMetering.GasLeftMock = 60
+
 	vmOutput := host.Output().GetVMOutput()
 	require.NotNil(t, vmOutput)
+	require.Equal(t, vmcommon.Ok, vmOutput.ReturnCode)
 
-	smartcontract := vmOutput.OutputAccounts["smartcontract"]
+	smartcontract, ok := vmOutput.OutputAccounts["smartcontract"]
+	require.True(t, ok)
 	require.Equal(t, big.NewInt(-88), smartcontract.BalanceDelta)
 	require.Empty(t, smartcontract.OutputTransfers)
 
-	destination := vmOutput.OutputAccounts["destination"]
+	destination, ok := vmOutput.OutputAccounts["destination"]
+	require.True(t, ok)
 	require.Equal(t, big.NewInt(88), destination.BalanceDelta)
 	require.Len(t, destination.OutputTransfers, 1)
 
@@ -542,7 +564,7 @@ func TestAsyncContext_ExecuteSyncCall_EarlyOutOfGas(t *testing.T) {
 	// Assert error propagation in async.executeSyncCall() from
 	// async.createContractCallInput()
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	asyncCall := defaultAsyncCall_AliceToBob()
@@ -557,7 +579,7 @@ func TestAsyncContext_ExecuteSyncCall_NoDynamicGasLocking_Simulation(t *testing.
 	// Successful execution at destination, but not enough gas for callback execution
 	// (this situation should not happen in practice, due to dynamic gas locking)
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	asyncCall := defaultAsyncCall_AliceToBob()
@@ -584,13 +606,20 @@ func TestAsyncContext_ExecuteSyncCall_NoDynamicGasLocking_Simulation(t *testing.
 	destInput.GasProvided = asyncCall.GasLimit - GasForAsyncStep
 	require.Equal(t, destInput, host.StoredInputs[0])
 
-	// Verify the final VMOutput, containing the failure
+	// Verify the final VMOutput, containing the failure.
 	expectedOutput := arwen.MakeVMOutput()
-	expectedOutput.ReturnCode = vmcommon.OutOfGas
+	expectedOutput.ReturnCode = vmcommon.Ok
 	expectedOutput.ReturnMessage = "not enough gas"
 	expectedOutput.GasRemaining = 0
 	arwen.AddFinishData(expectedOutput, []byte("out of gas"))
 	arwen.AddFinishData(expectedOutput, originalVMInput.CurrentTxHash)
+
+	// The expectedOutput must also contain an OutputAccount corresponding to
+	// Alice, because of a call to host.Output().GetOutputAccount() in
+	// host.Output().GetVMOutput(), which creates and caches an empty account for
+	// her.
+	arwen.AddNewOutputAccount(expectedOutput, Alice, 0, nil)
+
 	vmOutput := host.Output().GetVMOutput()
 	require.Equal(t, expectedOutput, vmOutput)
 }
@@ -600,7 +629,7 @@ func TestAsyncContext_ExecuteSyncCall_Successful(t *testing.T) {
 	// Successful execution at destination, and successful callback execution;
 	// the AsyncCall contains suficient gas this time.
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 	asyncCall := defaultAsyncCall_AliceToBob()
 	asyncCall.GasLimit = 100
@@ -649,13 +678,19 @@ func TestAsyncContext_ExecuteSyncCall_Successful(t *testing.T) {
 	expectedOutput.ReturnCode = vmcommon.Ok
 	expectedOutput.GasRemaining = 0
 
+	// The expectedOutput must also contain an OutputAccount corresponding to
+	// Alice, because of a call to host.Output().GetOutputAccount() in
+	// host.Output().GetVMOutput(), which creates and caches an empty account for
+	// her.
+	arwen.AddNewOutputAccount(expectedOutput, Alice, 0, nil)
+
 	actualOutput := host.Output().GetVMOutput()
 	require.Equal(t, expectedOutput, actualOutput)
 }
 
 func TestAsyncContext_CreateContractCallInput(t *testing.T) {
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 	asyncCall := &arwen.AsyncCall{
 		Destination: Bob,
@@ -686,7 +721,7 @@ func TestAsyncContext_CreateContractCallInput(t *testing.T) {
 
 func TestAsyncContext_CreateCallbackInput_DestinationCallSuccessful(t *testing.T) {
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	asyncCall := defaultAsyncCall_AliceToBob()
@@ -711,7 +746,7 @@ func TestAsyncContext_CreateCallbackInput_DestinationCallSuccessful(t *testing.T
 
 func TestAsyncContext_CreateCallbackInput_DestinationCallFailed(t *testing.T) {
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	asyncCall := defaultAsyncCall_AliceToBob()
@@ -739,7 +774,7 @@ func TestAsyncContext_CreateCallbackInput_DestinationCallFailed(t *testing.T) {
 func TestAsyncContext_CreateCallbackInput_NotEnoughGas(t *testing.T) {
 	// Due to dynamic gas locking, this situation should never happen
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	asyncCall := defaultAsyncCall_AliceToBob()
@@ -760,32 +795,46 @@ func TestAsyncContext_CreateCallbackInput_NotEnoughGas(t *testing.T) {
 
 func TestAsyncContext_FinishSyncExecution_NilError_NilVMOutput(t *testing.T) {
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 	async.finishSyncExecution(nil, nil)
+
+	// The expectedOutput must also contain an OutputAccount corresponding to
+	// Alice, because of a call to host.Output().GetOutputAccount() in
+	// host.Output().GetVMOutput(), which creates and caches an empty account for
+	// her.
 	expectedOutput := arwen.MakeVMOutput()
+	arwen.AddNewOutputAccount(expectedOutput, Alice, 0, nil)
+
 	require.Equal(t, expectedOutput, host.Output().GetVMOutput())
 }
 
 func TestAsyncContext_FinishSyncExecution_Error_NilVMOutput(t *testing.T) {
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	syncExecErr := arwen.ErrNotEnoughGas
 	async.finishSyncExecution(nil, syncExecErr)
 
 	expectedOutput := arwen.MakeVMOutput()
-	expectedOutput.ReturnCode = vmcommon.OutOfGas
+	expectedOutput.ReturnCode = vmcommon.Ok
 	expectedOutput.ReturnMessage = syncExecErr.Error()
 	arwen.AddFinishData(expectedOutput, []byte(vmcommon.OutOfGas.String()))
 	arwen.AddFinishData(expectedOutput, originalVMInput.CurrentTxHash)
+
+	// The expectedOutput must also contain an OutputAccount corresponding to
+	// Alice, because of a call to host.Output().GetOutputAccount() in
+	// host.Output().GetVMOutput(), which creates and caches an empty account for
+	// her.
+	arwen.AddNewOutputAccount(expectedOutput, Alice, 0, nil)
+
 	require.Equal(t, expectedOutput, host.Output().GetVMOutput())
 }
 
 func TestAsyncContext_FinishSyncExecution_ErrorAndVMOutput(t *testing.T) {
 	host, _, originalVMInput := InitializeArwenAndWasmer_AsyncContext_AliceAndBob()
-	host.Runtime().InitStateFromInput(originalVMInput)
+	host.Runtime().InitStateFromContractCallInput(originalVMInput)
 	async := NewAsyncContext(host)
 
 	syncExecOutput := arwen.MakeVMOutput()
@@ -795,10 +844,17 @@ func TestAsyncContext_FinishSyncExecution_ErrorAndVMOutput(t *testing.T) {
 	async.finishSyncExecution(syncExecOutput, syncExecErr)
 
 	expectedOutput := arwen.MakeVMOutput()
-	expectedOutput.ReturnCode = vmcommon.UserError
+	expectedOutput.ReturnCode = vmcommon.Ok
 	expectedOutput.ReturnMessage = "user made an error"
 	arwen.AddFinishData(expectedOutput, []byte(vmcommon.UserError.String()))
 	arwen.AddFinishData(expectedOutput, originalVMInput.CurrentTxHash)
+
+	// The expectedOutput must also contain an OutputAccount corresponding to
+	// Alice, because of a call to host.Output().GetOutputAccount() in
+	// host.Output().GetVMOutput(), which creates and caches an empty account for
+	// her.
+	arwen.AddNewOutputAccount(expectedOutput, Alice, 0, nil)
+
 	require.Equal(t, expectedOutput, host.Output().GetVMOutput())
 }
 

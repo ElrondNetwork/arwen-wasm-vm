@@ -51,18 +51,16 @@ func TestMeteringContext_UseGas(t *testing.T) {
 	meteringContext, _ := NewMeteringContext(host, config.MakeGasMapForTests(), uint64(15000))
 
 	gasProvided := uint64(1001)
-	vmInput := &vmcommon.VMInput{GasProvided: gasProvided}
-	mockRuntime.SetVMInput(vmInput)
+	meteringContext.gasForExecution = gasProvided
 	gas := uint64(1000)
 	meteringContext.UseGas(gas)
 	require.Equal(t, mockRuntime.GetPointsUsed(), gas)
 	require.Equal(t, uint64(1), meteringContext.GasLeft())
 
 	gasProvided = uint64(10000)
-	vmInput = &vmcommon.VMInput{GasProvided: gasProvided}
 	mockRuntime.SetPointsUsed(0)
-	mockRuntime.SetVMInput(vmInput)
 	meteringContext, _ = NewMeteringContext(host, config.MakeGasMapForTests(), uint64(15000))
+	meteringContext.gasForExecution = gasProvided
 
 	require.Equal(t, gasProvided, meteringContext.GasLeft())
 	meteringContext.UseGas(gas)
@@ -100,8 +98,7 @@ func TestMeteringContext_BoundGasLimit(t *testing.T) {
 	meteringContext, _ := NewMeteringContext(host, config.MakeGasMapForTests(), uint64(15000))
 
 	gasProvided := uint64(10000)
-	vmInput := &vmcommon.VMInput{GasProvided: gasProvided}
-	mockRuntime.SetVMInput(vmInput)
+	meteringContext.gasForExecution = gasProvided
 	mockRuntime.SetPointsUsed(0)
 
 	gasLimit := uint64(5000)
@@ -235,6 +232,7 @@ func TestMeteringContext_AsyncCallGasLocking(t *testing.T) {
 	mockRuntime.SetPointsUsed(0)
 	gasProvided := uint64(1_000_000)
 	input.GasProvided = gasProvided
+	meteringContext.gasForExecution = gasProvided
 	gasToLock := meteringContext.ComputeGasLockedForAsync()
 	err = meteringContext.UseGasBounded(gasToLock)
 	require.Nil(t, err)
@@ -243,8 +241,118 @@ func TestMeteringContext_AsyncCallGasLocking(t *testing.T) {
 
 	mockRuntime.VMInput.CallType = vmcommon.AsynchronousCallBack
 	mockRuntime.VMInput.GasLocked = gasToLock
-	meteringContext.UnlockGasIfAsyncCallback()
+	meteringContext.unlockGasIfAsyncCallback(&input.VMInput)
 	err = meteringContext.UseGasForAsyncStep()
 	require.Nil(t, err)
 	require.Equal(t, gasProvided-1, meteringContext.GasLeft())
+}
+
+func TestMeteringContext_GasUsed_NoStacking(t *testing.T) {
+	t.Parallel()
+
+	mockRuntime := &contextmock.RuntimeContextMock{}
+	host := &contextmock.VMHostMock{
+		RuntimeContext: mockRuntime,
+	}
+
+	contractSize := uint64(1000)
+	contract := make([]byte, contractSize)
+	input := &vmcommon.ContractCallInput{VMInput: vmcommon.VMInput{}}
+
+	mockRuntime.SCCodeSize = contractSize
+	mockRuntime.SetVMInput(&input.VMInput)
+	mockRuntime.SetPointsUsed(0)
+
+	metering, _ := NewMeteringContext(host, config.MakeGasMapForTests(), uint64(15000))
+
+	input.GasProvided = 2000
+	metering.InitStateFromContractCallInput(&input.VMInput)
+	require.Equal(t, uint64(2000), metering.initialGasProvided)
+
+	_ = metering.DeductInitialGasForExecution(contract)
+	require.Equal(t, uint64(999), metering.GasLeft())
+
+	metering.UseGas(400)
+	require.Equal(t, uint64(599), metering.GasLeft())
+
+	gasUsedByContract, _ := metering.GasUsedByContract()
+	require.Equal(t, uint64(1401), gasUsedByContract)
+}
+
+func TestMeteringContext_GasUsed_StackOneLevel(t *testing.T) {
+	t.Parallel()
+
+	mockRuntime := &contextmock.RuntimeContextMock{}
+	host := &contextmock.VMHostMock{
+		RuntimeContext: mockRuntime,
+	}
+
+	contractSize := uint64(1000)
+	contract := make([]byte, contractSize)
+	mockRuntime.SCCodeSize = contractSize
+	mockRuntime.SCAddress = []byte("parent")
+
+	mockRuntime.SetPointsUsed(0)
+	parentInput := &vmcommon.ContractCallInput{VMInput: vmcommon.VMInput{}}
+	mockRuntime.SetVMInput(&parentInput.VMInput)
+
+	metering, _ := NewMeteringContext(host, config.MakeGasMapForTests(), uint64(15000))
+
+	parentInput.GasProvided = 4000
+	metering.InitStateFromContractCallInput(&parentInput.VMInput)
+	require.Equal(t, uint64(4000), metering.initialGasProvided)
+
+	_ = metering.DeductInitialGasForExecution(contract)
+	require.Equal(t, uint64(2999), metering.GasLeft())
+
+	metering.UseGas(400)
+	require.Equal(t, uint64(2599), metering.GasLeft())
+
+	gasUsedByContract, _ := metering.GasUsedByContract()
+	require.Equal(t, uint64(1401), gasUsedByContract)
+
+	// simulate executing another contract on top of the parent
+	childInput := &vmcommon.ContractCallInput{VMInput: vmcommon.VMInput{}}
+	childInput.GasProvided = 500
+
+	metering.UseGas(childInput.GasProvided)
+	parentPointsBeforeStacking := mockRuntime.GetPointsUsed()
+
+	// child execution begins
+	mockRuntime.SCAddress = []byte("child")
+	mockRuntime.SetPointsUsed(0)
+	mockRuntime.SetVMInput(&childInput.VMInput)
+	metering.PushState()
+	metering.InitStateFromContractCallInput(&childInput.VMInput)
+	require.Equal(t, uint64(500), metering.initialGasProvided)
+
+	_ = metering.DeductInitialGasForExecution(make([]byte, 100))
+	require.Equal(t, uint64(399), metering.GasLeft())
+
+	metering.UseGas(50)
+	gasRemaining := metering.GasLeft()
+	require.Equal(t, uint64(349), gasRemaining)
+
+	gasUsedByContract, _ = metering.GasUsedByContract()
+	require.Equal(t, uint64(151), gasUsedByContract)
+
+	// return to the parent
+	mockRuntime.SCAddress = []byte("parent")
+	metering.PopSetActiveState()
+	mockRuntime.SetPointsUsed(parentPointsBeforeStacking)
+	mockRuntime.SetVMInput(&parentInput.VMInput)
+
+	metering.RestoreGas(gasRemaining)
+	mockRuntime.IsContractOnStack = false
+	metering.ForwardGas([]byte("parent"), []byte("child"), gasUsedByContract)
+	require.Equal(t, uint64(2448), metering.GasLeft())
+
+	gasUsedByContract, _ = metering.GasUsedByContract()
+	require.Equal(t, uint64(1401), gasUsedByContract)
+
+	metering.UseGas(50)
+	require.Equal(t, uint64(2398), metering.GasLeft())
+
+	gasUsedByContract, _ = metering.GasUsedByContract()
+	require.Equal(t, uint64(1451), gasUsedByContract)
 }

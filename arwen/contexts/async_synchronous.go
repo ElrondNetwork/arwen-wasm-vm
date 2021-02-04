@@ -46,7 +46,7 @@ func (context *asyncContext) executeSyncCall(asyncCall *arwen.AsyncCall) error {
 		return err
 	}
 
-	vmOutput, err := context.host.ExecuteOnDestContext(destinationCallInput)
+	vmOutput, _, err := context.host.ExecuteOnDestContext(destinationCallInput)
 
 	// The vmOutput instance returned by host.ExecuteOnDestContext() is never nil,
 	// by design. Using it without checking for err is safe here.
@@ -63,16 +63,37 @@ func (context *asyncContext) executeSyncCall(asyncCall *arwen.AsyncCall) error {
 
 func (context *asyncContext) executeSyncCallback(
 	asyncCall *arwen.AsyncCall,
-	vmOutput *vmcommon.VMOutput,
-	err error,
+	destinationVMOutput *vmcommon.VMOutput,
+	destinationErr error,
 ) (*vmcommon.VMOutput, error) {
+	metering := context.host.Metering()
+	runtime := context.host.Runtime()
 
-	callbackInput, err := context.createCallbackInput(asyncCall, vmOutput, err)
+	callbackInput, err := context.createCallbackInput(asyncCall, destinationVMOutput, destinationErr)
 	if err != nil {
 		return nil, err
 	}
 
-	return context.host.ExecuteOnDestContext(callbackInput)
+	gasConsumedForExecution := context.computeGasUsedInExecutionBeforeReset(callbackInput)
+	// used points should be reset before actually entering the callback execution
+	runtime.SetPointsUsed(0)
+	callbackVMOutput, _, callBackErr := context.host.ExecuteOnDestContext(callbackInput)
+
+	execMode := asyncCall.ExecutionMode
+	noErrorOnCallback := callBackErr == nil && callbackVMOutput.ReturnCode == vmcommon.Ok
+	noErrorOnAsyncCall := destinationErr == nil && destinationVMOutput.ReturnCode == vmcommon.Ok
+	if noErrorOnCallback && noErrorOnAsyncCall && execMode != arwen.AsyncBuiltinFuncIntraShard {
+		metering.UseGas(gasConsumedForExecution)
+	}
+
+	return callbackVMOutput, callBackErr
+}
+
+// TODO refactor this computation
+func (context *asyncContext) computeGasUsedInExecutionBeforeReset(vmInput *vmcommon.ContractCallInput) uint64 {
+	metering := context.host.Metering()
+	gasUsedForExecution, _ := math.SubUint64(metering.GasUsedForExecution(), vmInput.GasLocked)
+	return gasUsedForExecution
 }
 
 // executeCallGroupCallback synchronously executes the designated callback of
@@ -87,7 +108,7 @@ func (context *asyncContext) executeCallGroupCallback(group *arwen.AsyncCallGrou
 	}
 
 	input := context.createGroupCallbackInput(group)
-	vmOutput, err := context.host.ExecuteOnDestContext(input)
+	vmOutput, _, err := context.host.ExecuteOnDestContext(input)
 	context.finishSyncExecution(vmOutput, err)
 }
 
@@ -107,18 +128,22 @@ func (context *asyncContext) executeSyncHalfOfBuiltinFunction(asyncCall *arwen.A
 		return err
 	}
 
-	vmOutput, err := context.host.ExecuteOnDestContext(destinationCallInput)
+	vmOutput, _, err := context.host.ExecuteOnDestContext(destinationCallInput)
 	if err != nil {
 		return err
 	}
 
-	// If the synchronous half of the built-in function call has failed, go no
+	// If the in-shard half of the built-in function call has failed, go no
 	// further and execute the error callback of this AsyncCall.
 	if vmOutput.ReturnCode != vmcommon.Ok {
 		asyncCall.UpdateStatus(vmOutput.ReturnCode)
 		callbackVMOutput, callbackErr := context.executeSyncCallback(asyncCall, vmOutput, err)
 		context.finishSyncExecution(callbackVMOutput, callbackErr)
 	}
+
+	// The gas that remains after executing the in-shard half of the built-in
+	// function is provided to the cross-shard half.
+	asyncCall.GasLimit = vmOutput.GasRemaining
 
 	return nil
 }
@@ -127,7 +152,7 @@ func (context *asyncContext) executeSyncHalfOfBuiltinFunction(asyncCall *arwen.A
 // synchronously, already assuming the original caller is in the same shard
 func (context *asyncContext) executeSyncContextCallback() {
 	callbackCallInput := context.createContextCallbackInput()
-	callbackVMOutput, callBackErr := context.host.ExecuteOnDestContext(callbackCallInput)
+	callbackVMOutput, _, callBackErr := context.host.ExecuteOnDestContext(callbackCallInput)
 	context.finishSyncExecution(callbackVMOutput, callBackErr)
 }
 
@@ -146,13 +171,18 @@ func (context *asyncContext) finishSyncExecution(vmOutput *vmcommon.VMOutput, er
 		vmOutput = output.CreateVMOutputInCaseOfError(err)
 	}
 
-	output.SetReturnCode(vmOutput.ReturnCode)
+	// TODO Discuss whether consistency between in-shard and cross-shard results
+	// TODO of the callback, and how they're accessible to the caller / user.
+	// TODO Currently, a failed callback in-shard leaves the ReturnCode to
+	// TODO vmcommon.Ok, unless the following line is uncommented.
+	// output.SetReturnCode(vmOutput.ReturnCode)
+
 	output.SetReturnMessage(vmOutput.ReturnMessage)
 	output.Finish([]byte(vmOutput.ReturnCode.String()))
 	output.Finish(runtime.GetCurrentTxHash())
 }
 
-func (context *asyncContext) createContractCallInput(asyncCall arwen.AsyncCallHandler) (*vmcommon.ContractCallInput, error) {
+func (context *asyncContext) createContractCallInput(asyncCall *arwen.AsyncCall) (*vmcommon.ContractCallInput, error) {
 	host := context.host
 	runtime := host.Runtime()
 	sender := runtime.GetSCAddress()
@@ -216,11 +246,12 @@ func (context *asyncContext) createCallbackInput(
 
 	callbackFunction := asyncCall.GetCallbackName()
 
-	gasLimit := vmOutput.GasRemaining + asyncCall.GetGasLocked()
+	gasLimit := math.AddUint64(vmOutput.GasRemaining, asyncCall.GetGasLocked())
 	dataLength := computeDataLengthFromArguments(callbackFunction, arguments)
 
 	gasToUse := metering.GasSchedule().ElrondAPICost.AsyncCallStep
-	gas := metering.GasSchedule().BaseOperationCost.DataCopyPerByte * uint64(dataLength)
+	copyPerByte := metering.GasSchedule().BaseOperationCost.DataCopyPerByte
+	gas := math.MulUint64(copyPerByte, uint64(dataLength))
 	gasToUse = math.AddUint64(gasToUse, gas)
 	if gasLimit <= gasToUse {
 		return nil, arwen.ErrNotEnoughGas
@@ -236,6 +267,7 @@ func (context *asyncContext) createCallbackInput(
 			CallType:       vmcommon.AsynchronousCallBack,
 			GasPrice:       runtime.GetVMInput().GasPrice,
 			GasProvided:    gasLimit,
+			GasLocked:      0,
 			CurrentTxHash:  runtime.GetCurrentTxHash(),
 			OriginalTxHash: runtime.GetOriginalTxHash(),
 			PrevTxHash:     runtime.GetPrevTxHash(),

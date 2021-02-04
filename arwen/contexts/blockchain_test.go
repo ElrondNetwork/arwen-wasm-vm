@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var errAccountFault = errors.New("account fault")
 var errTestError = errors.New("some test error")
 
 var testAccounts = []*worldmock.Account{

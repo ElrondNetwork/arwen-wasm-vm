@@ -17,6 +17,7 @@ type RuntimeContextMock struct {
 	SCCodeSize             uint64
 	CallFunction           string
 	VMType                 []byte
+	IsContractOnStack      bool
 	ReadOnlyFlag           bool
 	VerifyCode             bool
 	CurrentBreakpointValue arwen.BreakpointValue
@@ -40,6 +41,10 @@ type RuntimeContextMock struct {
 func (r *RuntimeContextMock) InitState() {
 }
 
+// ReplaceInstanceBuilder mocked method()
+func (r *RuntimeContextMock) ReplaceInstanceBuilder(_ arwen.InstanceBuilder) {
+}
+
 // StartWasmerInstance mocked method
 func (r *RuntimeContextMock) StartWasmerInstance(_ []byte, _ uint64, _ bool) error {
 	if r.Err != nil {
@@ -48,8 +53,8 @@ func (r *RuntimeContextMock) StartWasmerInstance(_ []byte, _ uint64, _ bool) err
 	return nil
 }
 
-// InitStateFromInput mocked method
-func (r *RuntimeContextMock) InitStateFromInput(_ *vmcommon.ContractCallInput) {
+// InitStateFromContractCallInput mocked method
+func (r *RuntimeContextMock) InitStateFromContractCallInput(_ *vmcommon.ContractCallInput) {
 }
 
 // PushState mocked method
@@ -119,6 +124,11 @@ func (r *RuntimeContextMock) GetVMInput() *vmcommon.VMInput {
 // SetVMInput mocked method
 func (r *RuntimeContextMock) SetVMInput(vmInput *vmcommon.VMInput) {
 	r.VMInput = vmInput
+}
+
+// IsContractOnTheStack mocked method
+func (r *RuntimeContextMock) IsContractOnTheStack(_ []byte) bool {
+	return r.IsContractOnStack
 }
 
 // GetSCAddress mocked method

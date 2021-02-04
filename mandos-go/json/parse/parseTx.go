@@ -16,6 +16,7 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 
 	blt := mj.Transaction{
 		Type:      txType,
+		Value:     mj.JSONBigIntZero(),
 		ESDTValue: mj.JSONBigIntZero(),
 	}
 	var err error

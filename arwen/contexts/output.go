@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ElrondNetwork/arwen-wasm-vm/arwen"
+	"github.com/ElrondNetwork/arwen-wasm-vm/math"
 	"github.com/ElrondNetwork/elrond-go/core/vmcommon"
 )
 
@@ -99,7 +100,8 @@ func (context *outputContext) PopMergeActiveState() {
 	mergeVMOutputs(context.outputState, prevState)
 }
 
-// PopDiscard removes the latest entry from the state stack
+// PopDiscard removes the latest entry from the state stack, but maintaining
+// all GasUsed values.
 func (context *outputContext) PopDiscard() {
 	stateStackLen := len(context.stateStack)
 	if stateStackLen == 0 {
@@ -134,6 +136,7 @@ func (context *outputContext) ResetGas() {
 		outAcc.GasUsed = 0
 		for _, outTransfer := range outAcc.OutputTransfers {
 			outTransfer.GasLimit = 0
+			outTransfer.GasLocked = 0
 		}
 	}
 }
@@ -295,13 +298,81 @@ func (context *outputContext) AddTxValueToAccount(address []byte, value *big.Int
 
 // GetVMOutput updates the current VMOutput and returns it
 func (context *outputContext) GetVMOutput() *vmcommon.VMOutput {
+	runtime := context.host.Runtime()
+	metering := context.host.Metering()
+
+	remainedFromForwarded := uint64(0)
+	account, _ := context.GetOutputAccount(runtime.GetSCAddress())
 	if context.outputState.ReturnCode == vmcommon.Ok {
-		context.outputState.GasRemaining = context.host.Metering().GasLeft()
+		account.GasUsed, remainedFromForwarded = metering.GasUsedByContract()
+		context.outputState.GasRemaining = metering.GasLeft()
+
+		// backward compatibility
+		if !context.host.IsArwenV2Enabled() && account.GasUsed > metering.GetGasProvided() {
+			return context.CreateVMOutputInCaseOfError(arwen.ErrNotEnoughGas)
+		}
+	} else {
+		account.GasUsed = math.AddUint64(account.GasUsed, metering.GetGasProvided())
 	}
 
 	context.removeNonUpdatedCode(context.outputState)
 
+	err := context.checkGas(remainedFromForwarded)
+	if err != nil {
+		return context.CreateVMOutputInCaseOfError(err)
+	}
+
 	return context.outputState
+}
+
+func (context *outputContext) checkGas(remainedFromForwarded uint64) error {
+	if context.host.IsArwenV2Enabled() == false {
+		return nil
+	}
+
+	gasUsed := uint64(0)
+	gasLockSentForward := false
+	for _, outputAccount := range context.outputState.OutputAccounts {
+		gasUsed = math.AddUint64(gasUsed, outputAccount.GasUsed)
+		for _, outputTransfer := range outputAccount.OutputTransfers {
+			gasUsed = math.AddUint64(gasUsed, outputTransfer.GasLimit)
+			gasUsed = math.AddUint64(gasUsed, outputTransfer.GasLocked)
+
+			if outputTransfer.GasLocked > 0 {
+				gasLockSentForward = true
+			}
+		}
+	}
+
+	gasProvided := context.host.Metering().GetGasProvided()
+	wasBuiltInFuncWhichForwardedGas := gasLockSentForward && context.isBuiltInExecution()
+	if wasBuiltInFuncWhichForwardedGas {
+		gasProvided = math.AddUint64(gasProvided, context.host.Metering().GetGasLocked())
+	}
+
+	context.outputState.GasRemaining, remainedFromForwarded = math.SubUint64(context.outputState.GasRemaining, remainedFromForwarded)
+	totalGas := math.AddUint64(gasUsed, context.outputState.GasRemaining)
+	totalGas, _ = math.SubUint64(totalGas, remainedFromForwarded)
+
+	// TODO Consider using != instead of > in this condition, for strictness.
+	// Only two trivial tests fail with !=.
+	if totalGas > gasProvided {
+		log.Error("gas usage mismatch", "total gas used", totalGas, "gas provided", gasProvided)
+		return arwen.ErrInputAndOutputGasDoesNotMatch
+	}
+
+	return nil
+}
+
+func (context *outputContext) isBuiltInExecution() bool {
+	if context.host.IsBuiltinFunctionName(context.host.Runtime().Function()) {
+		return true
+	}
+	if len(context.host.Runtime().GetVMInput().ESDTTokenName) > 0 {
+		return true
+	}
+
+	return false
 }
 
 // DeployCode sets the given code to a an account, and creates a new codeUpdates entry at the accounts address.
@@ -331,13 +402,14 @@ func (context *outputContext) CreateVMOutputInCaseOfError(err error) *vmcommon.V
 	}
 
 	returnCode := context.resolveReturnCodeFromError(err)
-
-	return &vmcommon.VMOutput{
+	vmOutput := &vmcommon.VMOutput{
 		GasRemaining:  0,
 		GasRefund:     big.NewInt(0),
 		ReturnCode:    returnCode,
 		ReturnMessage: message,
 	}
+
+	return vmOutput
 }
 
 func (context *outputContext) removeNonUpdatedCode(vmOutput *vmcommon.VMOutput) {

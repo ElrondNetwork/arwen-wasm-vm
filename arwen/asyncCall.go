@@ -1,6 +1,9 @@
 package arwen
 
-import "github.com/ElrondNetwork/elrond-go/core/vmcommon"
+import (
+	"github.com/ElrondNetwork/arwen-wasm-vm/math"
+	"github.com/ElrondNetwork/elrond-go/core/vmcommon"
+)
 
 // AsyncCall holds the information about an individual async call
 type AsyncCall struct {
@@ -13,9 +16,6 @@ type AsyncCall struct {
 	ValueBytes      []byte
 	SuccessCallback string
 	ErrorCallback   string
-
-	// TODO this will be deleted when asyncContext.setupAsyncCallsGas() is deleted
-	ProvidedGas uint64
 }
 
 // Clone creates a deep clone of the AsyncCall
@@ -30,7 +30,6 @@ func (ac *AsyncCall) Clone() *AsyncCall {
 		ValueBytes:      make([]byte, len(ac.ValueBytes)),
 		SuccessCallback: ac.SuccessCallback,
 		ErrorCallback:   ac.ErrorCallback,
-		ProvidedGas:     ac.ProvidedGas,
 	}
 
 	copy(clone.Destination, ac.Destination)
@@ -58,6 +57,11 @@ func (ac *AsyncCall) GetGasLimit() uint64 {
 // GetGasLocked returns the gas locked for the async callback
 func (ac *AsyncCall) GetGasLocked() uint64 {
 	return ac.GasLocked
+}
+
+// GetTotalGas returns the sum of the gas limit and gas locked
+func (ac *AsyncCall) GetTotalGas() uint64 {
+	return math.AddUint64(ac.GasLimit, ac.GasLocked)
 }
 
 // GetValue returns the byte representation of the value of the async call

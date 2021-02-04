@@ -95,6 +95,12 @@ var ErrStoreElrondReservedKey = errors.New("cannot write to storage under Elrond
 // ErrCannotWriteProtectedKey signals an attempt to write to a protected key, while storage protection is enforced
 var ErrCannotWriteProtectedKey = errors.New("cannot write to protected key")
 
+// ErrNonPayableFunctionEgld signals that a non-payable function received non-zero call value
+var ErrNonPayableFunctionEgld = errors.New("function does not accept EGLD payment")
+
+// ErrNonPayableFunctionEsdt signals that a non-payable function received non-zero ESDT call value
+var ErrNonPayableFunctionEsdt = errors.New("function does not accept ESDT payment")
+
 // ErrArgIndexOutOfRange signals that the argument index is out of range
 var ErrArgIndexOutOfRange = errors.New("argument index out of range")
 
@@ -129,6 +135,16 @@ var ErrUnknownCallType = errors.New("unknown call type")
 
 var ErrCannotUseBuiltinAsCallback = errors.New("cannot use built-in function as callback")
 
+var ErrInvalidAsyncCallGroupID = errors.New("invalid async call group identifier")
+
+var ErrOnlyOneLegacyAsyncCallAllowed = errors.New("only one legacy async call allowed")
+
+var ErrLegacyAsyncCallNotFound = errors.New("legacy async call not found")
+
+var ErrLegacyAsyncCallInvalid = errors.New("legacy async call invalid")
+
+var ErrNoStoredAsyncContextFound = errors.New("no async context found in storage")
+
 // ErrInvalidAccount signals that a certain account does not exist
 var ErrInvalidAccount = errors.New("account does not exist")
 
@@ -158,12 +174,6 @@ var ErrBuiltinCallOnSameContextDisallowed = errors.New("calling built-in functio
 // ErrSyncExecutionNotInSameShard signals that the sync execution request is not in the same shard
 var ErrSyncExecutionNotInSameShard = errors.New("sync execution request is not in the same shard")
 
-var ErrInvalidAsyncCallGroupID = errors.New("invalid async call group identifier")
-
-var ErrOnlyOneLegacyAsyncCallAllowed = errors.New("only one legacy async call allowed")
-
-var ErrLegacyAsyncCallNotFound = errors.New("legacy async call not found")
-
-var ErrLegacyAsyncCallInvalid = errors.New("legacy async call invalid")
-
-var ErrNoStoredAsyncContextFound = errors.New("no async context found in storage")
+// ErrInputAndOutputGasDoesNotMatch is raised when the output gas (gas used + gas locked + gas remaining)
+// is not equal to the input gas
+var ErrInputAndOutputGasDoesNotMatch = errors.New("input and output gas does not match")

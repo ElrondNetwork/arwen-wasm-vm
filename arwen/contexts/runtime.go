@@ -19,7 +19,7 @@ var _ arwen.RuntimeContext = (*runtimeContext)(nil)
 
 type runtimeContext struct {
 	host         arwen.VMHost
-	instance     *wasmer.Instance
+	instance     wasmer.InstanceHandler
 	vmInput      *vmcommon.VMInput
 	scAddress    []byte
 	codeSize     uint64
@@ -30,7 +30,7 @@ type runtimeContext struct {
 	verifyCode bool
 
 	stateStack    []*runtimeContext
-	instanceStack []*wasmer.Instance
+	instanceStack []wasmer.InstanceHandler
 
 	maxWasmerInstances uint64
 
@@ -38,7 +38,9 @@ type runtimeContext struct {
 
 	useWarmInstance     bool
 	warmInstanceAddress []byte
-	warmInstance        *wasmer.Instance
+	warmInstance        wasmer.InstanceHandler
+
+	instanceBuilder arwen.InstanceBuilder
 }
 
 // NewRuntimeContext creates a new runtimeContext.
@@ -50,13 +52,14 @@ func NewRuntimeContext(host arwen.VMHost, vmType []byte, useWarmInstance bool) (
 		host:                host,
 		vmType:              vmType,
 		stateStack:          make([]*runtimeContext, 0),
-		instanceStack:       make([]*wasmer.Instance, 0),
+		instanceStack:       make([]wasmer.InstanceHandler, 0),
 		validator:           newWASMValidator(scAPINames, protocolBuiltinFunctions),
 		useWarmInstance:     useWarmInstance,
 		warmInstanceAddress: nil,
 		warmInstance:        nil,
 	}
 
+	context.instanceBuilder = &wasmerInstanceBuilder{}
 	context.InitState()
 
 	return context, nil
@@ -69,6 +72,14 @@ func (context *runtimeContext) InitState() {
 	context.callFunction = ""
 	context.verifyCode = false
 	context.readOnly = false
+}
+
+// ReplaceInstanceBuilder replaces the instance builder, allowing the creation
+// of mocked Wasmer instances
+// TODO remove after implementing proper mocking of
+// Wasmer instances; this is used for tests only
+func (context *runtimeContext) ReplaceInstanceBuilder(builder arwen.InstanceBuilder) {
+	context.instanceBuilder = builder
 }
 
 func (context *runtimeContext) setWarmInstanceWhenNeeded(gasLimit uint64) bool {
@@ -112,7 +123,7 @@ func (context *runtimeContext) makeInstanceFromCompiledCode(codeHash []byte, gas
 		Metering:           true,
 		RuntimeBreakpoints: true,
 	}
-	newInstance, err := wasmer.NewInstanceFromCompiledCodeWithOptions(compiledCode, options)
+	newInstance, err := context.instanceBuilder.NewInstanceFromCompiledCodeWithOptions(compiledCode, options)
 	if err != nil {
 		log.Warn("NewInstanceFromCompiledCodeWithOptions", "error", err)
 		return false
@@ -162,7 +173,7 @@ func (context *runtimeContext) makeInstanceFromContractByteCode(contract []byte,
 		Metering:           true,
 		RuntimeBreakpoints: true,
 	}
-	newInstance, err := wasmer.NewInstanceWithOptions(contract, options)
+	newInstance, err := context.instanceBuilder.NewInstanceWithOptions(contract, options)
 	if err != nil {
 		context.instance = nil
 		return err
@@ -241,7 +252,7 @@ func (context *runtimeContext) ResetWarmInstance() {
 		return
 	}
 
-	arwen.RemoveHostContext(*context.instance.Data)
+	arwen.RemoveHostContext(*context.instance.GetData())
 	context.instance.Clean()
 
 	context.instance = nil
@@ -260,9 +271,9 @@ func (context *runtimeContext) SetMaxInstanceCount(maxInstances uint64) {
 	context.maxWasmerInstances = maxInstances
 }
 
-// InitStateFromInput initializes the state of the runtime context
+// InitStateFromContractCallInput initializes the state of the runtime context
 // (and the async context) from the provided ContractCallInput.
-func (context *runtimeContext) InitStateFromInput(input *vmcommon.ContractCallInput) {
+func (context *runtimeContext) InitStateFromContractCallInput(input *vmcommon.ContractCallInput) {
 	context.SetVMInput(&input.VMInput)
 	context.scAddress = input.RecipientAddr
 	context.callFunction = input.Function
@@ -373,7 +384,7 @@ func (context *runtimeContext) GetVMInput() *vmcommon.VMInput {
 
 // SetVMInput sets the current VMInput to the one provided (cloned)
 func (context *runtimeContext) SetVMInput(vmInput *vmcommon.VMInput) {
-	if !context.host.IsArwenV2Enabled() || vmInput == nil {
+	if vmInput == nil {
 		context.vmInput = vmInput
 		return
 	}
@@ -606,7 +617,7 @@ func (context *runtimeContext) SetReadOnly(readOnly bool) {
 // GetInstanceExports returns the objects exported by the WASM bytecode after
 // the current Wasmer instance was started.
 func (context *runtimeContext) GetInstanceExports() wasmer.ExportsMap {
-	return context.instance.Exports
+	return context.instance.GetExports()
 }
 
 // CleanWasmerInstance cleans the current Wasmer instance.
@@ -615,14 +626,25 @@ func (context *runtimeContext) CleanWasmerInstance() {
 		return
 	}
 
-	arwen.RemoveHostContext(*context.instance.Data)
+	arwen.RemoveHostContext(*context.instance.GetData())
 	context.instance.Clean()
 	context.instance = nil
 }
 
+// IsContractOnTheStack iterates over the state stack to find whether the
+// provided SC address is already in execution, below the current instance.
+func (context *runtimeContext) IsContractOnTheStack(address []byte) bool {
+	for _, state := range context.stateStack {
+		if bytes.Equal(address, state.scAddress) {
+			return true
+		}
+	}
+	return false
+}
+
 // GetFunctionToCall returns the callable contract method to be executed, as exported by the Wasmer instance.
 func (context *runtimeContext) GetFunctionToCall() (wasmer.ExportedFunctionCallback, error) {
-	exports := context.instance.Exports
+	exports := context.instance.GetExports()
 	if function, ok := exports[context.callFunction]; ok {
 		return function, nil
 	}
@@ -637,7 +659,7 @@ func (context *runtimeContext) GetFunctionToCall() (wasmer.ExportedFunctionCallb
 // GetInitFunction returns the callable contract method which initializes the
 // contract immediately after deployment.
 func (context *runtimeContext) GetInitFunction() wasmer.ExportedFunctionCallback {
-	exports := context.instance.Exports
+	exports := context.instance.GetExports()
 	if init, ok := exports[arwen.InitFunctionName]; ok {
 		return init
 	}
@@ -646,7 +668,7 @@ func (context *runtimeContext) GetInitFunction() wasmer.ExportedFunctionCallback
 }
 
 func (context *runtimeContext) HasFunction(functionName string) bool {
-	_, ok := context.instance.Exports[functionName]
+	_, ok := context.instance.GetExports()[functionName]
 	return ok
 }
 
@@ -656,7 +678,7 @@ func (context *runtimeContext) MemLoad(offset int32, length int32) ([]byte, erro
 		return []byte{}, nil
 	}
 
-	memory := context.instance.InstanceCtx.Memory()
+	memory := context.instance.GetInstanceCtxMemory()
 	memoryView := memory.Data()
 	memoryLength := memory.Length()
 	requestedEnd := math.AddInt32(offset, length)
@@ -711,7 +733,7 @@ func (context *runtimeContext) MemStore(offset int32, data []byte) error {
 		return nil
 	}
 
-	memory := context.instance.InstanceCtx.Memory()
+	memory := context.instance.GetInstanceCtxMemory()
 	memoryView := memory.Data()
 	memoryLength := memory.Length()
 	requestedEnd := math.AddInt32(offset, dataLength)

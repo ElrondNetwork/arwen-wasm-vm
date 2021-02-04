@@ -318,6 +318,34 @@ func (blockchain *BlockchainHookGateway) GetUserAccount(address []byte) (vmcommo
 	return response.Account, response.GetError()
 }
 
+// GetCode forwards a message to the actual hook
+func (blockchain *BlockchainHookGateway) GetCode(account vmcommon.UserAccountHandler) []byte {
+	requestAccount := &common.Account{
+		Nonce:           account.GetNonce(),
+		Balance:         account.GetBalance(),
+		CodeHash:        account.GetCodeHash(),
+		RootHash:        account.GetRootHash(),
+		Address:         account.AddressBytes(),
+		DeveloperReward: account.GetDeveloperReward(),
+		OwnerAddress:    account.GetOwnerAddress(),
+		UserName:        account.GetUserName(),
+		CodeMetadata:    account.GetCodeMetadata(),
+	}
+
+	request := common.NewMessageBlockchainGetCodeRequest(requestAccount)
+	rawResponse, err := blockchain.messenger.SendHookCallRequest(request)
+	if err != nil {
+		return nil
+	}
+
+	if rawResponse.GetKind() != common.BlockchainGetCodeResponse {
+		return nil
+	}
+
+	response := rawResponse.(*common.MessageBlockchainGetCodeResponse)
+	return response.Code
+}
+
 // GetShardOfAddress forwards a message to the actual hook
 func (blockchain *BlockchainHookGateway) GetShardOfAddress(address []byte) uint32 {
 	request := common.NewMessageBlockchainGetShardOfAddressRequest(address)

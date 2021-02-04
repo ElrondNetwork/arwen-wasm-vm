@@ -26,7 +26,7 @@ type VMHostStub struct {
 	AsyncCalled                       func() arwen.AsyncContext
 	CreateNewContractCalled           func(input *vmcommon.ContractCreateInput) ([]byte, error)
 	ExecuteOnSameContextCalled        func(input *vmcommon.ContractCallInput) error
-	ExecuteOnDestContextCalled        func(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, error)
+	ExecuteOnDestContextCalled        func(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, uint64, error)
 	GetAPIMethodsCalled               func() *wasmer.Imports
 	GetProtocolBuiltinFunctionsCalled func() vmcommon.FunctionNames
 	IsBuiltinFunctionNameCalled       func(functionName string) bool
@@ -166,11 +166,11 @@ func (vhs *VMHostStub) ExecuteOnSameContext(input *vmcommon.ContractCallInput) e
 }
 
 // ExecuteOnDestContext mocked method
-func (vhs *VMHostStub) ExecuteOnDestContext(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, error) {
+func (vhs *VMHostStub) ExecuteOnDestContext(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, uint64, error) {
 	if vhs.ExecuteOnDestContextCalled != nil {
 		return vhs.ExecuteOnDestContextCalled(input)
 	}
-	return nil, nil
+	return nil, 0, nil
 }
 
 // AreInSameShard mocked method

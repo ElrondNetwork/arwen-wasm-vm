@@ -173,6 +173,105 @@
                 },
                 "+": ""
             }
+        },
+        {
+            "step": "scCall",
+            "txId": "proposeSCCall",
+            "tx": {
+                "from": "address:paul",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "proposeSCCall",
+                "arguments": [
+                    "address:adder",
+                    "0",
+                    "str:add",
+                    "1234"
+                ],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["4"],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "sc-deploy-sign-alice",
+            "tx": {
+                "from": "address:alice",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "sign",
+                "arguments": ["4"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "sc-deploy-sign-bob",
+            "tx": {
+                "from": "address:bob",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "sign",
+                "arguments": ["4"],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "sc-deploy-perform",
+            "tx": {
+                "from": "address:paul",
+                "to": "address:multisig",
+                "value": "0",
+                "function": "performAction",
+                "arguments": ["4"],
+                "gasLimit": "1,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:adder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "``sum": "2468"
+                    },
+                    "code": "file:../test-contracts/adder.wasm"
+                },
+                "+": ""
+            }
         }
     ]
 }

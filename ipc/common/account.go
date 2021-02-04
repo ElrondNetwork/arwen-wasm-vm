@@ -15,7 +15,6 @@ type Account struct {
 	OwnerAddress    []byte
 	UserName        []byte
 	CodeMetadata    []byte
-	Code            []byte
 }
 
 // AddressBytes gets the address
@@ -26,11 +25,6 @@ func (a *Account) AddressBytes() []byte {
 // GetNonce gets the nonce
 func (a *Account) GetNonce() uint64 {
 	return a.Nonce
-}
-
-// GetCode gets the code
-func (a *Account) GetCode() []byte {
-	return a.Code
 }
 
 // GetCodeMetadata gets the code metadata

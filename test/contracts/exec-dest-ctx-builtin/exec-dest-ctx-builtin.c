@@ -9,7 +9,7 @@ void testBuiltins1() {
 	byte functionLength = 12;
 
 	value[31] = 96;
-	u64 result = executeOnSameContext(
+	u64 result = executeOnDestContext(
 			500,
 			scAddress,
 			value,
@@ -29,7 +29,7 @@ void testBuiltins2() {
 	byte functionLength = 18;
 
 	value[31] = 100;
-	u64 result = executeOnSameContext(
+	u64 result = executeOnDestContext(
 			500,
 			scAddress,
 			value,
@@ -49,7 +49,7 @@ void testBuiltins3() {
 	byte functionLength = 18;
 
 	value[31] = 11;
-	u64 result = executeOnSameContext(
+	u64 result = executeOnDestContext(
 			500,
 			scAddress,
 			value,

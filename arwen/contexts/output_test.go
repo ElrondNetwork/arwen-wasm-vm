@@ -361,7 +361,10 @@ func TestOutputContext_MergeVMOutputs(t *testing.T) {
 func TestOutputContext_VMOutputError(t *testing.T) {
 	t.Parallel()
 
-	host := &contextmock.VMHostMock{}
+	host := &contextmock.VMHostMock{
+		MeteringContext: &contextmock.MeteringContextMock{},
+		RuntimeContext:  &contextmock.RuntimeContextMock{},
+	}
 
 	outputContext, _ := NewOutputContext(host)
 

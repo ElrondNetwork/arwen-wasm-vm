@@ -58,7 +58,7 @@ func runERC20Benchmark(tb testing.TB, nTransfers int, nRuns int) {
 			require.Equal(tb, vmcommon.Ok, vmOutput.ReturnCode)
 			require.Equal(tb, "", vmOutput.ReturnMessage)
 
-			mockWorld.UpdateAccounts(vmOutput.OutputAccounts, nil)
+			_ = mockWorld.UpdateAccounts(vmOutput.OutputAccounts, nil)
 		}
 		elapsedTime := time.Since(start)
 		fmt.Printf("Executing %d ERC20 transfers: %s\n", nTransfers, elapsedTime.String())
@@ -117,7 +117,7 @@ func deploy(tb testing.TB, totalTokenSupply *big.Int) (*vmHost, *worldmock.MockW
 	require.Equal(tb, vmcommon.Ok, vmOutput.ReturnCode)
 
 	// Ensure the deployment persists in the mock BlockchainHook
-	mockWorld.UpdateAccounts(vmOutput.OutputAccounts, nil)
+	_ = mockWorld.UpdateAccounts(vmOutput.OutputAccounts, nil)
 	return host, mockWorld
 }
 

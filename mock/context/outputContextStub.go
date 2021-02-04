@@ -19,6 +19,7 @@ type OutputContextStub struct {
 	ClearStateStackCalled             func()
 	CopyTopOfStackToActiveStateCalled func()
 	CensorVMOutputCalled              func()
+	ResetGasCalled                    func()
 	GetOutputAccountCalled            func(address []byte) (*vmcommon.OutputAccount, bool)
 	DeleteOutputAccountCalled         func(address []byte)
 	WriteLogCalled                    func(address []byte, topics [][]byte, data []byte)
@@ -38,7 +39,6 @@ type OutputContextStub struct {
 	DeployCodeCalled                  func(input arwen.CodeDeployInput)
 	CreateVMOutputInCaseOfErrorCalled func(err error) *vmcommon.VMOutput
 	AddToActiveStateCalled            func(vmOutput *vmcommon.VMOutput)
-	ResetConsumedGasCalled            func()
 	TransferValueOnlyCalled           func(destination []byte, sender []byte, value *big.Int) error
 }
 
@@ -107,8 +107,8 @@ func (o *OutputContextStub) CensorVMOutput() {
 
 // ResetGas mocked method
 func (o *OutputContextStub) ResetGas() {
-	if o.ResetConsumedGasCalled != nil {
-		o.ResetConsumedGasCalled()
+	if o.ResetGasCalled != nil {
+		o.ResetGasCalled()
 	}
 }
 

@@ -52,9 +52,12 @@ const (
 	// with its corresponding callback
 	SyncExecution AsyncCallExecutionMode = iota
 
-	// AsyncBuiltinFunc indicates that the async call is a cross-shard call to a
+	// AsyncBuiltinFuncIntraShard indicates that the async call is an intra-shard built in function call
+	AsyncBuiltinFuncIntraShard
+
+	// AsyncBuiltinFuncCrossShard indicates that the async call is a cross-shard call to a
 	// built-in function, which is executed half in-shard, half cross-shard
-	AsyncBuiltinFunc
+	AsyncBuiltinFuncCrossShard
 
 	// AsyncUnknown indicates that the async call cannot be executed locally, and
 	// must be forwarded to the destination account

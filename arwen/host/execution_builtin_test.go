@@ -14,11 +14,8 @@ import (
 var ESDTTransferGasCost = uint64(1)
 var ESDTTestTokenName = []byte("TT")
 
-func TestExecution_ExecuteOnSameContext_BuiltinFunctions(t *testing.T) {
-	// TODO rewrite to use ExecuteOnDestContext(). It is disallowed to call a
-	// built-in function with ExecuteOnSameContext().
-	t.Skip()
-	code := arwen.GetTestSCCode("exec-same-ctx-builtin", "../../")
+func TestExecution_ExecuteOnDestContext_BuiltinFunctions(t *testing.T) {
+	code := arwen.GetTestSCCode("exec-dest-ctx-builtin", "../../")
 	scBalance := big.NewInt(1000)
 
 	host, stubBlockchainHook := defaultTestArwenForCall(t, code, scBalance)
@@ -36,7 +33,7 @@ func TestExecution_ExecuteOnSameContext_BuiltinFunctions(t *testing.T) {
 	require.Nil(t, err)
 
 	require.NotNil(t, vmOutput)
-	expectedVMOutput := expectedVMOutputSameCtxBuiltinFunctions1(code)
+	expectedVMOutput := expectedVMOutputDestCtxBuiltinFunctions1(code)
 	require.Equal(t, expectedVMOutput, vmOutput)
 
 	// Run function testBuiltins2
@@ -47,7 +44,7 @@ func TestExecution_ExecuteOnSameContext_BuiltinFunctions(t *testing.T) {
 	require.Nil(t, err)
 
 	require.NotNil(t, vmOutput)
-	expectedVMOutput = expectedVMOutputSameCtxBuiltinFunctions2(code)
+	expectedVMOutput = expectedVMOutputDestCtxBuiltinFunctions2(code)
 	require.Equal(t, expectedVMOutput, vmOutput)
 
 	// Run function testBuiltins3
@@ -57,7 +54,7 @@ func TestExecution_ExecuteOnSameContext_BuiltinFunctions(t *testing.T) {
 	vmOutput, err = host.RunSmartContractCall(input)
 	require.Nil(t, err)
 	require.NotNil(t, vmOutput)
-	expectedVMOutput = expectedVMOutputSameCtxBuiltinFunctions3(code)
+	expectedVMOutput = expectedVMOutputDestCtxBuiltinFunctions3(code)
 	require.Equal(t, expectedVMOutput, vmOutput)
 }
 
@@ -127,7 +124,7 @@ func TestESDT_GettersAPI_ExecuteAfterBuiltinCall(t *testing.T) {
 	host.InitState()
 
 	_ = host.Runtime().StartWasmerInstance(dummyCode, input.GasProvided, true)
-	vmOutput, err := host.ExecuteOnDestContext(input)
+	vmOutput, _, err := host.ExecuteOnDestContext(input)
 	require.Nil(t, err)
 	require.NotNil(t, vmOutput)
 	require.Equal(t, vmcommon.Ok, vmOutput.ReturnCode)
@@ -135,22 +132,25 @@ func TestESDT_GettersAPI_ExecuteAfterBuiltinCall(t *testing.T) {
 }
 
 func dummyProcessBuiltInFunction(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, error) {
-	outPutAccounts := make(map[string]*vmcommon.OutputAccount)
-	outPutAccounts[string(parentAddress)] = &vmcommon.OutputAccount{
+	outputAccounts := make(map[string]*vmcommon.OutputAccount)
+	outputAccounts[string(parentAddress)] = &vmcommon.OutputAccount{
 		BalanceDelta: big.NewInt(0),
-		Address:      parentAddress}
+		Address:      parentAddress,
+	}
+
+	gasConsumed := uint64(100)
 
 	if input.Function == "builtinClaim" {
-		outPutAccounts[string(parentAddress)].BalanceDelta = big.NewInt(42)
+		outputAccounts[string(parentAddress)].BalanceDelta = big.NewInt(42)
 		return &vmcommon.VMOutput{
-			GasRemaining:   400 + input.GasLocked,
-			OutputAccounts: outPutAccounts,
+			GasRemaining:   input.GasProvided - gasConsumed + input.GasLocked,
+			OutputAccounts: outputAccounts,
 		}, nil
 	}
 	if input.Function == "builtinDoSomething" {
 		return &vmcommon.VMOutput{
-			GasRemaining:   400 + input.GasLocked,
-			OutputAccounts: outPutAccounts,
+			GasRemaining:   input.GasProvided - gasConsumed + input.GasLocked,
+			OutputAccounts: outputAccounts,
 		}, nil
 	}
 	if input.Function == "builtinFail" {
@@ -163,7 +163,7 @@ func dummyProcessBuiltInFunction(input *vmcommon.ContractCallInput) (*vmcommon.V
 	}
 	if input.Function == core.BuiltInFunctionESDTTransfer {
 		vmOutput := &vmcommon.VMOutput{
-			GasRemaining: input.GasProvided - ESDTTransferGasCost + input.GasLocked,
+			GasRemaining: 0,
 		}
 		function := string(input.Arguments[2])
 		esdtTransferTxData := function
@@ -172,7 +172,7 @@ func dummyProcessBuiltInFunction(input *vmcommon.ContractCallInput) (*vmcommon.V
 		}
 		outTransfer := vmcommon.OutputTransfer{
 			Value:    big.NewInt(0),
-			GasLimit: 0,
+			GasLimit: input.GasProvided - ESDTTransferGasCost + input.GasLocked,
 			Data:     []byte(esdtTransferTxData),
 			CallType: vmcommon.AsynchronousCall,
 		}

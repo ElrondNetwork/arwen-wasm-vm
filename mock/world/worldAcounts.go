@@ -16,6 +16,7 @@ type Account struct {
 	BalanceDelta    *big.Int
 	Storage         map[string][]byte
 	Code            []byte
+	CodeHash        []byte
 	CodeMetadata    []byte
 	AsyncCallData   string
 	OwnerAddress    []byte
@@ -68,12 +69,6 @@ func addressKey(address []byte) string {
 	return string(address)
 }
 
-// StorageKey builds a key for the mock
-func StorageKey(address []byte) string {
-	//return string(big.NewInt(0).SetBytes(address).Bytes())
-	return string(address)
-}
-
 // StorageValue yields the storage value for key, default 0
 func (a *Account) StorageValue(key string) []byte {
 	value, found := a.Storage[key]
@@ -81,14 +76,6 @@ func (a *Account) StorageValue(key string) []byte {
 		return storageDefaultValue
 	}
 	return value
-}
-
-// AccountAddress converts to account address bytes from big.Int
-func AccountAddress(i *big.Int) []byte {
-	if i.Sign() < 0 {
-		panic("address cannot be negative")
-	}
-	return i.Bytes()
 }
 
 // AddressBytes -
@@ -113,7 +100,7 @@ func (a *Account) GetCodeMetadata() []byte {
 
 // GetCodeHash -
 func (a *Account) GetCodeHash() []byte {
-	return []byte{}
+	return a.CodeHash
 }
 
 // GetRootHash -

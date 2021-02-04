@@ -329,7 +329,7 @@ func (context *asyncContext) RegisterLegacyAsyncCall(address []byte, data []byte
 	}
 
 	metering := context.host.Metering()
-	gasLimit := metering.GasLeft() - gasToLock
+	gasLimit, _ := math.SubUint64(metering.GasLeft(), gasToLock)
 
 	err = context.addAsyncCall(legacyGroupID, &arwen.AsyncCall{
 		Status:          arwen.AsyncCallPending,
@@ -436,10 +436,18 @@ func (context *asyncContext) Execute() error {
 }
 
 func (context *asyncContext) executeAsyncCall(asyncCall *arwen.AsyncCall) error {
-	if asyncCall.ExecutionMode == arwen.AsyncBuiltinFunc {
+	// Cross-shard calls to built-in functions have two halves: an intra-shard
+	// half, followed by sending the call across shards.
+	if asyncCall.ExecutionMode == arwen.AsyncBuiltinFuncIntraShard {
 		err := context.executeSyncHalfOfBuiltinFunction(asyncCall)
 		if err != nil {
 			return err
+		}
+
+		// If the intra-shard half of the built-in function has failed, stop here
+		// and do not send the built-in call across shards.
+		if asyncCall.Status != arwen.AsyncCallPending {
+			return nil
 		}
 	}
 
@@ -590,6 +598,7 @@ func (context *asyncContext) Delete() error {
 
 func (context *asyncContext) determineExecutionMode(destination []byte, data []byte) (arwen.AsyncCallExecutionMode, error) {
 	runtime := context.host.Runtime()
+	blockchain := context.host.Blockchain()
 
 	// If ArgParser cannot read the Data field, then this is neither a SC call,
 	// nor a built-in function call.
@@ -599,21 +608,27 @@ func (context *asyncContext) determineExecutionMode(destination []byte, data []b
 	}
 
 	sameShard := context.host.AreInSameShard(runtime.GetSCAddress(), destination)
-	if sameShard {
-		return arwen.SyncExecution, nil
-	}
 
 	if context.host.IsBuiltinFunctionName(functionName) {
-		return arwen.AsyncBuiltinFunc, nil
+		if sameShard {
+			return arwen.AsyncBuiltinFuncIntraShard, nil
+		}
+		return arwen.AsyncBuiltinFuncCrossShard, nil
+	}
+
+	code, err := blockchain.GetCode(destination)
+	if len(code) > 0 && err == nil {
+		return arwen.SyncExecution, nil
 	}
 
 	return arwen.AsyncUnknown, nil
 }
 
-func (context *asyncContext) sendAsyncCallCrossShard(asyncCall arwen.AsyncCallHandler) error {
+func (context *asyncContext) sendAsyncCallCrossShard(asyncCall *arwen.AsyncCall) error {
 	host := context.host
 	runtime := host.Runtime()
 	output := host.Output()
+	metering := host.Metering()
 
 	err := output.Transfer(
 		asyncCall.GetDestination(),
@@ -625,12 +640,10 @@ func (context *asyncContext) sendAsyncCallCrossShard(asyncCall arwen.AsyncCallHa
 		vmcommon.AsynchronousCall,
 	)
 	if err != nil {
-		metering := host.Metering()
-		metering.UseGas(metering.GasLeft())
-		runtime.FailExecution(err)
 		return err
 	}
 
+	metering.ForwardGas(runtime.GetSCAddress(), asyncCall.Destination, asyncCall.GetTotalGas())
 	return nil
 }
 
@@ -674,6 +687,11 @@ func (context *asyncContext) sendContextCallbackToOriginalCaller() error {
 		runtime.FailExecution(err)
 		return err
 	}
+
+	// TODO it is imperative to test gas forwarding here, before merging into master
+	gasLeft := metering.GasLeft()
+	metering.ForwardGas(runtime.GetSCAddress(), currentCall.CallerAddr, gasLeft)
+	metering.UseGas(gasLeft)
 
 	return nil
 }

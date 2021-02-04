@@ -34,7 +34,7 @@ func defaultTestArwenForDeployment(t *testing.T, _ uint64, newAddress []byte) *v
 		return newAddress, nil
 	}
 
-	host, _ := defaultTestArwen(t, stubBlockchainHook)
+	host := defaultTestArwen(t, stubBlockchainHook)
 	return host
 }
 
@@ -43,15 +43,38 @@ func defaultTestArwenForCall(tb testing.TB, code []byte, balance *big.Int) (*vmH
 	stubBlockchainHook.GetUserAccountCalled = func(scAddress []byte) (vmcommon.UserAccountHandler, error) {
 		if bytes.Equal(scAddress, parentAddress) {
 			return &contextmock.StubAccount{
-				Code:    code,
 				Balance: balance,
 			}, nil
 		}
 		return nil, errAccountNotFound
 	}
+	stubBlockchainHook.GetCodeCalled = func(account vmcommon.UserAccountHandler) []byte {
+		return code
+	}
 
-	host, _ := defaultTestArwen(tb, stubBlockchainHook)
+	host := defaultTestArwen(tb, stubBlockchainHook)
 	return host, stubBlockchainHook
+}
+
+func defaultTestArwenForCallWithInstanceMocks(tb testing.TB) (*vmHost, *contextmock.BlockchainHookStub, *contextmock.InstanceBuilderMock) {
+	stubBlockchainHook := &contextmock.BlockchainHookStub{}
+	stubBlockchainHook.GetUserAccountCalled = func(scAddress []byte) (vmcommon.UserAccountHandler, error) {
+		return &contextmock.StubAccount{
+			Address: scAddress,
+			Balance: big.NewInt(1000),
+		}, nil
+	}
+	stubBlockchainHook.GetCodeCalled = func(account vmcommon.UserAccountHandler) []byte {
+		return account.AddressBytes()
+	}
+
+	host := defaultTestArwen(tb, stubBlockchainHook)
+
+	code := arwen.GetTestSCCode("counter", "../../")
+	instanceBuilderMock := contextmock.NewInstanceBuilderMock(tb, code)
+	host.Runtime().ReplaceInstanceBuilder(instanceBuilderMock)
+
+	return host, stubBlockchainHook, instanceBuilderMock
 }
 
 // defaultTestArwenForTwoSCs creates an Arwen vmHost configured for testing calls between 2 SmartContracts
@@ -75,25 +98,34 @@ func defaultTestArwenForTwoSCs(
 	stubBlockchainHook.GetUserAccountCalled = func(scAddress []byte) (vmcommon.UserAccountHandler, error) {
 		if bytes.Equal(scAddress, parentAddress) {
 			return &contextmock.StubAccount{
-				Code:    parentCode,
+				Address: parentAddress,
 				Balance: parentSCBalance,
 			}, nil
 		}
 		if bytes.Equal(scAddress, childAddress) {
 			return &contextmock.StubAccount{
-				Code:    childCode,
+				Address: childAddress,
 				Balance: childSCBalance,
 			}, nil
 		}
 
 		return nil, errAccountNotFound
 	}
+	stubBlockchainHook.GetCodeCalled = func(account vmcommon.UserAccountHandler) []byte {
+		if bytes.Equal(account.AddressBytes(), parentAddress) {
+			return parentCode
+		}
+		if bytes.Equal(account.AddressBytes(), childAddress) {
+			return childCode
+		}
+		return nil
+	}
 
-	host, _ := defaultTestArwen(t, stubBlockchainHook)
+	host := defaultTestArwen(t, stubBlockchainHook)
 	return host, stubBlockchainHook
 }
 
-func defaultTestArwen(tb testing.TB, blockchain vmcommon.BlockchainHook) (*vmHost, error) {
+func defaultTestArwen(tb testing.TB, blockchain vmcommon.BlockchainHook) *vmHost {
 	gasSchedule := customGasSchedule
 	if gasSchedule == nil {
 		gasSchedule = config.MakeGasMapForTests()
@@ -110,7 +142,7 @@ func defaultTestArwen(tb testing.TB, blockchain vmcommon.BlockchainHook) (*vmHos
 	})
 	require.Nil(tb, err)
 	require.NotNil(tb, host)
-	return host, err
+	return host
 }
 
 // DefaultTestContractCreateInput creates a vmcommon.ContractCreateInput struct with default values

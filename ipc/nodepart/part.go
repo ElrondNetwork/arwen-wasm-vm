@@ -53,6 +53,7 @@ func NewNodePart(
 	part.Repliers[common.BlockchainGetBuiltinFunctionNamesRequest] = part.replyToBlockchainGetBuiltinFunctionNames
 	part.Repliers[common.BlockchainGetAllStateRequest] = part.replyToBlockchainGetAllState
 	part.Repliers[common.BlockchainGetUserAccountRequest] = part.replyToBlockchainGetUserAccount
+	part.Repliers[common.BlockchainGetCodeRequest] = part.replyToBlockchainGetCode
 	part.Repliers[common.BlockchainGetShardOfAddressRequest] = part.replyToBlockchainGetShardOfAddress
 	part.Repliers[common.BlockchainIsSmartContractRequest] = part.replyToBlockchainIsSmartContract
 	part.Repliers[common.BlockchainIsPayableRequest] = part.replyToBlockchainIsPayable

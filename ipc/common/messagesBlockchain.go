@@ -510,6 +510,34 @@ func NewMessageBlockchainGetUserAccountResponse(account *Account, err error) *Me
 	return message
 }
 
+// NewMessageBlockchainGetCodeRequest represents a request message
+type MessageBlockchainGetCodeRequest struct {
+	Message
+	Account *Account
+}
+
+// NewMessageBlockchainGetCodeRequest creates a request message
+func NewMessageBlockchainGetCodeRequest(account *Account) *MessageBlockchainGetCodeRequest {
+	message := &MessageBlockchainGetCodeRequest{}
+	message.Kind = BlockchainGetCodeRequest
+	message.Account = account
+	return message
+}
+
+// MessageBlockchainGetCodeResponse represents a response message
+type MessageBlockchainGetCodeResponse struct {
+	Message
+	Code []byte
+}
+
+// NewMessageBlockchainGetCodeResponse creates a response message
+func NewMessageBlockchainGetCodeResponse(code []byte) *MessageBlockchainGetCodeResponse {
+	message := &MessageBlockchainGetCodeResponse{}
+	message.Kind = BlockchainGetCodeResponse
+	message.Code = code
+	return message
+}
+
 // MessageBlockchainGetShardOfAddressRequest represents a request message
 type MessageBlockchainGetShardOfAddressRequest struct {
 	Message

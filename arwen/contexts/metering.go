@@ -1,6 +1,8 @@
 package contexts
 
 import (
+	"bytes"
+
 	"github.com/ElrondNetwork/arwen-wasm-vm/arwen"
 	"github.com/ElrondNetwork/arwen-wasm-vm/config"
 	"github.com/ElrondNetwork/arwen-wasm-vm/math"
@@ -8,9 +10,19 @@ import (
 )
 
 type meteringContext struct {
-	gasSchedule   *config.GasCost
-	blockGasLimit uint64
-	host          arwen.VMHost
+	host               arwen.VMHost
+	stateStack         []*meteringContext
+	gasSchedule        *config.GasCost
+	blockGasLimit      uint64
+	initialGasProvided uint64
+	initialCost        uint64
+	gasForExecution    uint64
+	gasStates          map[string]*contractGasState
+}
+
+type contractGasState struct {
+	forwarded uint64
+	returned  uint64
 }
 
 // NewMeteringContext creates a new meteringContext
@@ -26,15 +38,91 @@ func NewMeteringContext(
 	}
 
 	context := &meteringContext{
+		host:          host,
+		stateStack:    make([]*meteringContext, 0),
+		gasStates:     make(map[string]*contractGasState),
 		gasSchedule:   gasSchedule,
 		blockGasLimit: blockGasLimit,
-		host:          host,
 	}
+
+	context.InitState()
 
 	return context, nil
 }
 
-// GasSchedule returns the entire gas schedule.
+// InitState resets the internal state of the MeteringContext
+func (context *meteringContext) InitState() {
+	context.gasStates = make(map[string]*contractGasState)
+	context.initialGasProvided = 0
+	context.initialCost = 0
+	context.gasForExecution = 0
+}
+
+// PushState pushes the current state of the MeteringContext on its internal state stack
+func (context *meteringContext) PushState() {
+	newState := &meteringContext{
+		initialGasProvided: context.initialGasProvided,
+		initialCost:        context.initialCost,
+		gasForExecution:    context.gasForExecution,
+	}
+
+	context.stateStack = append(context.stateStack, newState)
+}
+
+// PopSetActiveState pops the state at the top of the internal state stack, and
+// sets it as the current state
+func (context *meteringContext) PopSetActiveState() {
+	stateStackLen := len(context.stateStack)
+	if stateStackLen == 0 {
+		return
+	}
+
+	prevState := context.stateStack[stateStackLen-1]
+	context.stateStack = context.stateStack[:stateStackLen-1]
+
+	context.initialGasProvided = prevState.initialGasProvided
+	context.initialCost = prevState.initialCost
+	context.gasForExecution = prevState.gasForExecution
+}
+
+// PopDiscard pops the state at the top of the internal state stack, and discards it
+func (context *meteringContext) PopDiscard() {
+	stateStackLen := len(context.stateStack)
+	if stateStackLen == 0 {
+		return
+	}
+
+	context.stateStack = context.stateStack[:stateStackLen-1]
+}
+
+// ClearStateStack reinitializes the internal state stack to an empty stack
+func (context *meteringContext) ClearStateStack() {
+	context.stateStack = make([]*meteringContext, 0)
+}
+
+// InitStateFromContractCallInput initializes the internal state of the
+// MeteringContext using values taken from the provided ContractCallInput
+func (context *meteringContext) InitStateFromContractCallInput(input *vmcommon.VMInput) {
+	context.unlockGasIfAsyncCallback(input)
+	context.initialGasProvided = input.GasProvided
+	context.gasForExecution = input.GasProvided
+	context.initialCost = 0
+}
+
+// unlockGasIfAsyncCallback unlocks the locked gas if the call type is async callback
+func (context *meteringContext) unlockGasIfAsyncCallback(input *vmcommon.VMInput) {
+	if input.CallType != vmcommon.AsynchronousCallBack {
+		return
+	}
+
+	gasProvided := math.AddUint64(input.GasProvided, input.GasLocked)
+
+	context.gasForExecution = gasProvided
+	input.GasProvided = gasProvided
+	input.GasLocked = 0
+}
+
+// GasSchedule returns the current gas schedule
 func (context *meteringContext) GasSchedule() *config.GasCost {
 	return context.gasSchedule
 }
@@ -72,7 +160,7 @@ func (context *meteringContext) FreeGas(gas uint64) {
 
 // GasLeft computes the amount of gas left on the currently running Wasmer instance.
 func (context *meteringContext) GasLeft() uint64 {
-	gasProvided := context.host.Runtime().GetVMInput().GasProvided
+	gasProvided := context.gasForExecution
 	gasUsed := context.host.Runtime().GetPointsUsed()
 
 	if gasProvided < gasUsed {
@@ -80,6 +168,110 @@ func (context *meteringContext) GasLeft() uint64 {
 	}
 
 	return gasProvided - gasUsed
+}
+
+// ForwardGas accumulates the gas forwarded by the current contract for the execution of other contracts
+func (context *meteringContext) ForwardGas(sourceAddress []byte, destAddress []byte, gas uint64) {
+	// Gas forwarded to any contract (including self-forwarding) is recorded for
+	// the current contract.
+	context.addForwardedGas(sourceAddress, gas)
+
+	// If the address to which the gas is being forwarded already exists on the
+	// execution stack, but is not directly below the current contract, it means
+	// that any gas that has been forwarded to it is in fact returning via the
+	// current contract.
+	selfCall := bytes.Equal(sourceAddress, destAddress)
+	alreadyOnExecutionStack := context.host.Runtime().IsContractOnTheStack(destAddress)
+	if selfCall || alreadyOnExecutionStack {
+		context.addReturnedGas(destAddress, gas)
+	}
+}
+
+func (context *meteringContext) addForwardedGas(address []byte, gas uint64) {
+	state := context.getContractGasState(address)
+	state.forwarded = math.AddUint64(state.forwarded, gas)
+}
+
+func (context *meteringContext) addReturnedGas(address []byte, gas uint64) {
+	state := context.getContractGasState(address)
+	state.returned = math.AddUint64(state.returned, gas)
+}
+
+func (context *meteringContext) getTotalForwardedGas(address []byte) uint64 {
+	state := context.getContractGasState(address)
+	total, _ := math.SubUint64(state.forwarded, state.returned)
+	return total
+}
+
+func (context *meteringContext) getContractGasState(address []byte) *contractGasState {
+	key := string(address)
+	state, exists := context.gasStates[key]
+	if !exists {
+		state = &contractGasState{
+			forwarded: 0,
+			returned:  0,
+		}
+		context.gasStates[key] = state
+	}
+
+	return state
+}
+
+// GasUsedByContract returns the gas used by the current contract.
+func (context *meteringContext) GasUsedByContract() (uint64, uint64) {
+	runtime := context.host.Runtime()
+	executionGasUsed := runtime.GetPointsUsed()
+
+	gasUsed := uint64(0)
+	if context.host.IsArwenV2Enabled() {
+		gasUsed = context.initialCost
+	}
+
+	gasUsed = math.AddUint64(gasUsed, executionGasUsed)
+
+	totalGasForwarded := context.getTotalForwardedGas(runtime.GetSCAddress())
+	remainedFromForwarded := uint64(0)
+	gasUsed, remainedFromForwarded = math.SubUint64(gasUsed, totalGasForwarded)
+
+	return gasUsed, remainedFromForwarded
+}
+
+// GasUsedForExecution returns the actual gas used for execution for the contract which needs to be restored
+func (context *meteringContext) GasUsedForExecution() uint64 {
+	gasUsed, _ := context.GasUsedByContract()
+	gasUsed, _ = math.SubUint64(gasUsed, context.initialCost)
+	return gasUsed
+}
+
+// GasSpentByContract calculates the entire gas consumption of the contract,
+// without any gas forwarding.
+func (context *meteringContext) GasSpentByContract() uint64 {
+	runtime := context.host.Runtime()
+	executionGasUsed := runtime.GetPointsUsed()
+
+	gasSpent := uint64(0)
+	if context.host.IsArwenV2Enabled() {
+		gasSpent = context.initialCost
+	}
+
+	gasSpent = math.AddUint64(gasSpent, executionGasUsed)
+
+	return gasSpent
+}
+
+// GetGasForExecution returns the gas left after the deduction of the initial gas from the provided gas
+func (context *meteringContext) GetGasForExecution() uint64 {
+	return context.gasForExecution
+}
+
+// GetGasProvided returns the fully provided gas for the sc execution
+func (context *meteringContext) GetGasProvided() uint64 {
+	return context.initialGasProvided
+}
+
+// GetSCPrepareInitialCost return the initial prepare cost for the sc execution
+func (context *meteringContext) GetSCPrepareInitialCost() uint64 {
+	return context.initialCost
 }
 
 // BoundGasLimit returns the maximum between the provided amount and the gas
@@ -104,7 +296,8 @@ func (context *meteringContext) UseGasForAsyncStep() error {
 // UseGasBounded consumes the specified amount of gas on the currently running
 // Wasmer instance, but returns an error if there is not enough gas left.
 func (context *meteringContext) UseGasBounded(gasToUse uint64) error {
-	if context.GasLeft() < gasToUse {
+	gasLeft := context.GasLeft()
+	if gasLeft < gasToUse {
 		return arwen.ErrNotEnoughGas
 	}
 	context.UseGas(gasToUse)
@@ -162,10 +355,12 @@ func (context *meteringContext) BlockGasLimit() uint64 {
 // DeductInitialGasForExecution deducts gas for compilation and locks gas if the execution is an asynchronous call
 func (context *meteringContext) DeductInitialGasForExecution(contract []byte) error {
 	costPerByte := context.gasSchedule.BaseOperationCost.CompilePerByte
+	baseCost := uint64(0)
 	if context.host.IsAheadOfTimeCompileEnabled() {
 		costPerByte = context.gasSchedule.BaseOperationCost.AoTPreparePerByte
+		baseCost = context.gasSchedule.BaseOperationCost.GetCode
 	}
-	err := context.deductInitialGas(contract, 0, costPerByte)
+	err := context.deductInitialGas(contract, baseCost, costPerByte)
 	if err != nil {
 		return err
 	}
@@ -205,6 +400,7 @@ func (context *meteringContext) deductInitialGas(
 		return arwen.ErrNotEnoughGas
 	}
 
-	input.GasProvided -= initialCost
+	context.initialCost = initialCost
+	context.gasForExecution = input.GasProvided - initialCost
 	return nil
 }
