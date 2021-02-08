@@ -476,8 +476,10 @@ func getExternalBalance(context unsafe.Pointer, addressOffset int32, resultOffse
 	}
 
 	balance := blockchain.GetBalance(address)
+	balance32Bytes := make([]byte, arwen.BalanceLen)
+	copy(balance32Bytes[arwen.BalanceLen-len(balance):], balance)
 
-	err = runtime.MemStore(resultOffset, balance)
+	err = runtime.MemStore(resultOffset, balance32Bytes)
 	if arwen.WithFault(err, context, runtime.ElrondAPIErrorShouldFailExecution()) {
 		return
 	}

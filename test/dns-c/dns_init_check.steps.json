@@ -1,0 +1,36 @@
+{
+    "name": "dns check init",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "''an_account____________________sy": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-owner",
+            "tx": {
+                "from": "''an_account____________________sy",
+                "to": "''dns____________________________|0x00",
+                "value": "0",
+                "function": "getOwnerAddressView",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "''dns_owner_______________________" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

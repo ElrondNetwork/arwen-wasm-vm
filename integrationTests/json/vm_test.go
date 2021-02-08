@@ -294,7 +294,7 @@ func TestDelegation_v0_5_2_update(t *testing.T) {
 	}
 }
 
-func TestDnsContract(t *testing.T) {
+func TestRustDnsContract(t *testing.T) {
 	if testing.Short() {
 		t.Skip("not a short test")
 	}
@@ -307,7 +307,29 @@ func TestDnsContract(t *testing.T) {
 	)
 	err = runner.RunAllJSONScenariosInDirectory(
 		getTestRoot(),
-		"dns",
+		"dns-rust",
+		".scen.json",
+		[]string{})
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCDnsContract(t *testing.T) {
+	if testing.Short() {
+		t.Skip("not a short test")
+	}
+
+	executor, err := am.NewArwenTestExecutor()
+	require.Nil(t, err)
+	runner := mc.NewScenarioRunner(
+		executor,
+		mc.NewDefaultFileResolver(),
+	)
+	err = runner.RunAllJSONScenariosInDirectory(
+		getTestRoot(),
+		"dns-c",
 		".scen.json",
 		[]string{})
 

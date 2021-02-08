@@ -1,0 +1,44 @@
+{
+    "name": "register, ok",
+    "steps": [
+        {
+            "step": "scCall",
+            "txId": "claim",
+            "tx": {
+                "from": "''dns_owner_______________________",
+                "to": "''dns____________________________|0xb9",
+                "value": "0",
+                "function": "claim",
+                "arguments": [],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "''dns_owner_______________________": {
+                    "nonce": "*",
+                    "balance": "123,000",
+                    "storage": {},
+                    "code": "",
+                    "asyncCallData": "str:dns claim"
+                },
+                "''dns____________________________|0xb9": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": "*",
+                    "code": "file:dns.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

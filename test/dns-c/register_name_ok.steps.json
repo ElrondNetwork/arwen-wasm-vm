@@ -1,0 +1,128 @@
+{
+    "name": "register, ok",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "''cool_address__________________sz": {
+                    "nonce": "0",
+                    "balance": "123,000",
+                    "storage": {},
+                    "code": "file:user-mock.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-hash",
+            "tx": {
+                "from": "''an_account____________________sy",
+                "to": "''dns____________________________|0x00",
+                "value": "0",
+                "function": "nameHashView",
+                "arguments": [
+                    "''coolname0001"
+                ],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "keccak256:``coolname0001" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "check-shard",
+            "tx": {
+                "from": "''an_account____________________sy",
+                "to": "''dns____________________________|0x00",
+                "value": "0",
+                "function": "nameShardView",
+                "arguments": [
+                    "''coolname0001"
+                ],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "0xb9" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "register-coolname0001",
+            "tx": {
+                "from": "''cool_address__________________sz",
+                "to": "''dns____________________________|0xb9",
+                "value": "123,000",
+                "function": "registerNameEndpoint",
+                "arguments": [
+                    "''coolname0001"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "resolve-coolname0001",
+            "tx": {
+                "from": "''an_account____________________sy",
+                "to": "''dns____________________________|0xb9",
+                "value": "0",
+                "function": "resolveView",
+                "arguments": [
+                    "''coolname0001"
+                ],
+                "gasLimit": "100,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "''cool_address__________________sz" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "Value 2 (Commited) is in little endian for some reason",
+            "accounts": {
+                "''cool_address__________________sz": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {
+                        "''name": "``coolname0001"
+                    },
+                    "code": "file:user-mock.wasm"
+                },
+                "''dns____________________________|0xb9": {
+                    "nonce": "*",
+                    "balance": "123,000",
+                    "storage": {
+                        "str:REGISTRATION_COST": "123,000",
+                        "str:VALUE_STATE|keccak256:''coolname0001": "0x02000000|''cool_address__________________sz"
+                    },
+                    "code": "file:dns.wasm"
+                },
+                "+": ""
+            }
+        }
+    ]
+}
