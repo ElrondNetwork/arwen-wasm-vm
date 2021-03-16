@@ -22,6 +22,7 @@ type VMHostStub struct {
 	BlockchainCalled                  func() arwen.BlockchainContext
 	RuntimeCalled                     func() arwen.RuntimeContext
 	BigIntCalled                      func() arwen.BigIntContext
+	BytesHeapCalled                   func() arwen.BytesHeapContext
 	OutputCalled                      func() arwen.OutputContext
 	MeteringCalled                    func() arwen.MeteringContext
 	StorageCalled                     func() arwen.StorageContext
@@ -92,6 +93,14 @@ func (vhs *VMHostStub) Runtime() arwen.RuntimeContext {
 func (vhs *VMHostStub) BigInt() arwen.BigIntContext {
 	if vhs.BigIntCalled != nil {
 		return vhs.BigIntCalled()
+	}
+	return nil
+}
+
+// BytesHeap mocked method
+func (vhs *VMHostStub) BytesHeap() arwen.BytesHeapContext {
+	if vhs.BytesHeapCalled != nil {
+		return vhs.BytesHeapCalled()
 	}
 	return nil
 }

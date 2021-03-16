@@ -24,6 +24,7 @@ const counterWasmCode = "./../../test/contracts/counter/output/counter.wasm"
 func MakeAPIImports() *wasmer.Imports {
 	imports, _ := elrondapi.ElrondEIImports()
 	imports, _ = elrondapi.BigIntImports(imports)
+	imports, _ = elrondapi.ByteBufferImports(imports)
 	imports, _ = elrondapi.SmallIntImports(imports)
 	imports, _ = cryptoapi.CryptoImports(imports)
 	return imports

@@ -637,6 +637,11 @@ func (context *runtimeContext) BigIntAPIErrorShouldFailExecution() bool {
 	return true
 }
 
+// ByteBufferAPIErrorShouldFailExecution returns true
+func (context *runtimeContext) ByteBufferAPIErrorShouldFailExecution() bool {
+	return true
+}
+
 // CryptoAPIErrorShouldFailExecution returns true
 func (context *runtimeContext) CryptoAPIErrorShouldFailExecution() bool {
 	return true

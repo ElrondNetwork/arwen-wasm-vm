@@ -41,6 +41,7 @@ type vmHost struct {
 	meteringContext   arwen.MeteringContext
 	storageContext    arwen.StorageContext
 	bigIntContext     arwen.BigIntContext
+	bytesHeapContext  arwen.BytesHeapContext
 
 	scAPIMethods             *wasmer.Imports
 	protocolBuiltinFunctions vmcommon.FunctionNames
@@ -76,6 +77,7 @@ func NewArwenVM(
 		blockchainContext:        nil,
 		storageContext:           nil,
 		bigIntContext:            nil,
+		bytesHeapContext:         nil,
 		scAPIMethods:             nil,
 		protocolBuiltinFunctions: hostParameters.ProtocolBuiltinFunctions,
 		arwenV2EnableEpoch:       hostParameters.ArwenV2EnableEpoch,
@@ -93,6 +95,11 @@ func NewArwenVM(
 	}
 
 	imports, err = elrondapi.BigIntImports(imports)
+	if err != nil {
+		return nil, err
+	}
+
+	imports, err = elrondapi.ByteBufferImports(imports)
 	if err != nil {
 		return nil, err
 	}
@@ -148,6 +155,11 @@ func NewArwenVM(
 		return nil, err
 	}
 
+	host.bytesHeapContext, err = contexts.NewBytesHeapContext()
+	if err != nil {
+		return nil, err
+	}
+
 	gasCostConfig, err := config.CreateGasConfig(hostParameters.GasSchedule)
 	if err != nil {
 		return nil, err
@@ -196,6 +208,11 @@ func (host *vmHost) Storage() arwen.StorageContext {
 // BigInt returns the BigIntContext instance of the host
 func (host *vmHost) BigInt() arwen.BigIntContext {
 	return host.bigIntContext
+}
+
+// BytesHeap returns the BytesHeapContext instance of the host
+func (host *vmHost) BytesHeap() arwen.BytesHeapContext {
+	return host.bytesHeapContext
 }
 
 // IsArwenV2Enabled returns whether the Arwen V2 mode is enabled
@@ -263,6 +280,7 @@ func (host *vmHost) InitState() {
 func (host *vmHost) initContexts() {
 	host.ClearContextStateStack()
 	host.bigIntContext.InitState()
+	host.bytesHeapContext.InitState()
 	host.outputContext.InitState()
 	host.meteringContext.InitState()
 	host.runtimeContext.InitState()
@@ -273,6 +291,7 @@ func (host *vmHost) initContexts() {
 // ClearContextStateStack cleans the state stacks of all the contexts of the host
 func (host *vmHost) ClearContextStateStack() {
 	host.bigIntContext.ClearStateStack()
+	host.bytesHeapContext.ClearStateStack()
 	host.outputContext.ClearStateStack()
 	host.meteringContext.ClearStateStack()
 	host.runtimeContext.ClearStateStack()

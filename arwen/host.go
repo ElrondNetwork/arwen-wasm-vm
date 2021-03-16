@@ -84,6 +84,11 @@ func GetBigIntContext(context unsafe.Pointer) BigIntContext {
 	return GetVMContext(context).BigInt()
 }
 
+// GetBytesHeapContext returns the bytes heap context
+func GetBytesHeapContext(context unsafe.Pointer) BytesHeapContext {
+	return GetVMContext(context).BytesHeap()
+}
+
 // GetOutputContext returns the output context
 func GetOutputContext(context unsafe.Pointer) OutputContext {
 	return GetVMContext(context).Output()

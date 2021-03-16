@@ -24,6 +24,7 @@ type VMHostMock struct {
 	MeteringContext   arwen.MeteringContext
 	StorageContext    arwen.StorageContext
 	BigIntContext     arwen.BigIntContext
+	BytesHeapContext  arwen.BytesHeapContext
 
 	SCAPIMethods  *wasmer.Imports
 	IsBuiltinFunc bool
@@ -62,6 +63,11 @@ func (host *VMHostMock) Storage() arwen.StorageContext {
 // BigInt mocked method
 func (host *VMHostMock) BigInt() arwen.BigIntContext {
 	return host.BigIntContext
+}
+
+// BytesHeap mocked method
+func (host *VMHostMock) BytesHeap() arwen.BytesHeapContext {
+	return host.BytesHeapContext
 }
 
 // IsArwenV2Enabled mocked method

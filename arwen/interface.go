@@ -31,6 +31,7 @@ type VMHost interface {
 	Blockchain() BlockchainContext
 	Runtime() RuntimeContext
 	BigInt() BigIntContext
+	BytesHeap() BytesHeapContext
 	Output() OutputContext
 	Metering() MeteringContext
 	Storage() StorageContext
@@ -134,6 +135,7 @@ type RuntimeContext interface {
 	ElrondSyncExecAPIErrorShouldFailExecution() bool
 	CryptoAPIErrorShouldFailExecution() bool
 	BigIntAPIErrorShouldFailExecution() bool
+	ByteBufferAPIErrorShouldFailExecution() bool
 	ExecuteAsyncCall(address []byte, data []byte, value []byte) error
 
 	// TODO remove after implementing proper mocking of Wasmer instances; this is
@@ -149,6 +151,15 @@ type BigIntContext interface {
 	GetOne(id int32) *big.Int
 	GetTwo(id1, id2 int32) (*big.Int, *big.Int)
 	GetThree(id1, id2, id3 int32) (*big.Int, *big.Int, *big.Int)
+}
+
+// BytesHeapContext defines the functionality needed for interacting with the bytes heap
+type BytesHeapContext interface {
+	StateStack
+
+	NewByteBuffer(value []byte) int32
+	GetByteBuffer(id int32) []byte
+	SetByteBuffer(handle int32, value []byte)
 }
 
 // OutputContext defines the functionality needed for interacting with the output context
