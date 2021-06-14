@@ -7,7 +7,7 @@
             "comment": "activate genesis always activates ALL nodes, so we make sure they are not too many",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "removeNodes",
                 "arguments": [
@@ -29,7 +29,7 @@
             "txId": "delegator 2 unstake (adjust for genesis)",
             "tx": {
                 "from": "''delegator_2___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawInactiveStake",
                 "arguments": [
@@ -43,7 +43,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "topics": [
                             "''delegator_2___________________s1"

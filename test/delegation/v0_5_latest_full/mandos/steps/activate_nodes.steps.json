@@ -6,7 +6,7 @@
             "txId": "activate",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "stakeNodes",
                 "arguments": [
@@ -23,7 +23,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000003",
                         "topics": [],
                         "data": "0x"
@@ -38,7 +38,7 @@
             "txId": "check-node_state-4_1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -66,7 +66,7 @@
             "txId": "check-stake-by-type-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -90,7 +90,7 @@
             "txId": "check-stake-by-type-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -114,7 +114,7 @@
             "txId": "check-stake-by-type-total",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalStakeByType",
                 "arguments": [],
@@ -135,13 +135,13 @@
             "step": "checkState",
             "comment": "check that stake was sent",
             "accounts": {
-                "address:delegation_contract": {
+                "sc:delegation": {
                     "nonce": "*",
                     "balance": "1,000,000,000",
                     "storage": "*",
                     "code": "file:../../output/delegation_latest_full.wasm"
                 },
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "300,000,000,000,000",
                     "storage": "*",

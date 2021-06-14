@@ -16,7 +16,7 @@
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:recursive-caller": {
+                "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "1000",
                     "storage": {},
@@ -29,7 +29,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:recursive-caller",
+                "to": "sc:recursive-caller",
                 "value": "0",
                 "function": "recursive_send_funds",
                 "arguments": [
@@ -61,10 +61,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "5",
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "5"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:recursive-caller": {
+                "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "995",
                     "storage": {},

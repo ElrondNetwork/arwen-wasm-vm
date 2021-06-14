@@ -26,24 +26,32 @@ type StorageKeyValuePair struct {
 
 // CheckAccount is a json object representing checks for an account.
 type CheckAccount struct {
-	Address       JSONBytesFromString
-	Comment       string
-	Nonce         JSONCheckUint64
-	Balance       JSONCheckBigInt
-	Username      JSONCheckBytes
-	IgnoreStorage bool
-	CheckStorage  []*StorageKeyValuePair
-	Code          JSONCheckBytes
-	Owner         JSONCheckBytes
-	AsyncCallData JSONCheckBytes
-	IgnoreESDT    bool
-	CheckESDTData []*CheckESDTData
+	Address               JSONBytesFromString
+	Comment               string
+	Nonce                 JSONCheckUint64
+	Balance               JSONCheckBigInt
+	Username              JSONCheckBytes
+	CheckStorage          []*CheckStorageKeyValuePair
+	IgnoreStorage         bool
+	MoreStorageAllowed    bool
+	Code                  JSONCheckBytes
+	Owner                 JSONCheckBytes
+	AsyncCallData         JSONCheckBytes
+	CheckESDTData         []*CheckESDTData
+	IgnoreESDT            bool
+	MoreESDTTokensAllowed bool
+}
+
+// CheckStorageKeyValuePair checks a single entry in storage.
+type CheckStorageKeyValuePair struct {
+	Key        JSONBytesFromString
+	CheckValue JSONCheckBytes
 }
 
 // CheckAccounts encodes rules to check mock accounts.
 type CheckAccounts struct {
-	OtherAccountsAllowed bool
-	Accounts             []*CheckAccount
+	Accounts            []*CheckAccount
+	MoreAccountsAllowed bool
 }
 
 // FindAccount searches an account list by address.

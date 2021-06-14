@@ -38,7 +38,7 @@
             "step": "checkState",
             "comment": "check that stake was transferred",
             "accounts": {
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "*",
                     "balance": "333,001,000,000,000",
                     "storage": "*",

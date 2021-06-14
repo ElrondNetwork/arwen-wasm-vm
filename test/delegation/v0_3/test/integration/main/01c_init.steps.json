@@ -6,7 +6,7 @@
             "txId": "check auction addr",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAuctionContractAddress",
                 "arguments": [],
@@ -14,7 +14,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "''auction_contract______________s1" ],
+                "out": [ "sc:auction" ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -26,7 +26,7 @@
             "txId": "getNumBlocksBeforeForceUnstake",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNumBlocksBeforeForceUnstake",
                 "arguments": [],
@@ -46,7 +46,7 @@
             "txId": "getNumBlocksBeforeUnBond",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNumBlocksBeforeUnBond",
                 "arguments": [],
@@ -66,7 +66,7 @@
             "txId": "check-stake-per-node",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getStakePerNode",
                 "arguments": [],
@@ -86,7 +86,7 @@
             "txId": "check-fee",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],

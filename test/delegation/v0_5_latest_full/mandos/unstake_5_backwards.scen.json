@@ -48,7 +48,7 @@
             "txId": "delegator 3 stake 1",
             "tx": {
                 "from": "address:delegator3",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "200,000,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -60,7 +60,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:delegator3"
@@ -84,7 +84,7 @@
             "txId": "delegator 3 stake 2",
             "tx": {
                 "from": "address:delegator3",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "300,000,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -96,7 +96,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:delegator3"
@@ -113,7 +113,7 @@
             "txId": "getFullWaitingList-before-unstake",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getFullWaitingList",
                 "arguments": [],
@@ -136,7 +136,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator3",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["10,000,000,000,000"],
@@ -156,7 +156,7 @@
             "txId": "getFullWaitingList-after-unstake",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getFullWaitingList",
                 "arguments": [],

@@ -17,14 +17,14 @@ func (pfe *fuzzDelegationExecutor) stake(delegIndex int, amount *big.Int) error 
 		"step": "transfer",
 		"txId": "%d",
 		"tx": {
-			"from": "''%s",
-			"to": "''%s",
+			"from": "%s",
+			"to": "%s",
 			"value": "%d"
 		}
 	}`,
 		pfe.nextTxIndex(),
-		string(pfe.faucetAddress),
-		string(pfe.delegatorAddress(delegIndex)),
+		pfe.faucetAddress,
+		pfe.delegatorAddress(delegIndex),
 		amount,
 	))
 	if err != nil {
@@ -37,8 +37,8 @@ func (pfe *fuzzDelegationExecutor) stake(delegIndex int, amount *big.Int) error 
 		"step": "scCall",
 		"txId": "%d",
 		"tx": {
-			"from": "''%s",
-			"to": "''%s",
+			"from": "%s",
+			"to": "%s",
 			"value": "%d",
 			"function": "stake",
 			"arguments": [],
@@ -47,8 +47,8 @@ func (pfe *fuzzDelegationExecutor) stake(delegIndex int, amount *big.Int) error 
 		}
 	}`,
 		pfe.nextTxIndex(),
-		string(pfe.delegatorAddress(delegIndex)),
-		string(pfe.delegationContractAddress),
+		pfe.delegatorAddress(delegIndex),
+		pfe.delegationContractAddress,
 		amount,
 	))
 	pfe.log("stake, delegator: %d, amount: %d", delegIndex, amount)
@@ -62,18 +62,18 @@ func (pfe *fuzzDelegationExecutor) unStake(delegatorIndex int, stake *big.Int) e
 		"step": "scCall",
 		"txId": "%d",
 		"tx": {
-			"from": "''%s",
-			"to": "''%s",
+			"from": "%s",
+			"to": "%s",
 			"value": "0",
 			"function": "unStake",
 			"arguments": ["%d"],
-			"gasLimit": "100,000,000",
+			"gasLimit": "500,000,000",
 			"gasPrice": "0"
 		}
 	}`,
 		pfe.nextTxIndex(),
-		string(pfe.delegatorAddress(delegatorIndex)),
-		string(pfe.delegationContractAddress),
+		pfe.delegatorAddress(delegatorIndex),
+		pfe.delegationContractAddress,
 		stake,
 	))
 	if err != nil {
@@ -81,6 +81,8 @@ func (pfe *fuzzDelegationExecutor) unStake(delegatorIndex int, stake *big.Int) e
 	}
 	if output.ReturnCode == vmi.Ok {
 		pfe.log("unStake, delegator: %d", delegatorIndex)
+	} else if output.ReturnCode == vmi.OutOfGas {
+		panic(fmt.Sprintf("unStake, delegator: %d, out of gas, message: %s", delegatorIndex, output.ReturnMessage))
 	} else {
 		pfe.log("unStake, delegator: %d, fail, %s", delegatorIndex, output.ReturnMessage)
 	}
@@ -90,73 +92,81 @@ func (pfe *fuzzDelegationExecutor) unStake(delegatorIndex int, stake *big.Int) e
 }
 
 func (pfe *fuzzDelegationExecutor) unBond(delegatorIndex int) error {
-	deferredPaymentBefore, err := pfe.getUserStakeOfType(delegatorIndex, UserDeferredPayment)
+	unbondable, err := pfe.getUserStakeOfType(delegatorIndex, UserUnbondable)
 	if err != nil {
 		return err
 	}
-	withdrawOnly, err := pfe.getUserStakeOfType(delegatorIndex, UserWithdrawOnly)
-	if err != nil {
-		return err
-	}
+	unbondedSum := big.NewInt(0)
 
-	output, err := pfe.executeTxStep(fmt.Sprintf(`
-	{
-		"step": "scCall",
-		"txId": "%d",
-		"tx": {
-			"from": "''%s",
-			"to": "''%s",
-			"value": "0",
-			"function": "unBond",
-			"arguments": [],
-			"gasLimit": "100,000,000",
-			"gasPrice": "0"
+	callIndex := 0
+	for unbondable.Sign() > 0 {
+		callIndex++
+		output, err := pfe.executeTxStep(fmt.Sprintf(`
+		{
+			"step": "scCall",
+			"txId": "%d",
+			"tx": {
+				"from": "%s",
+				"to": "%s",
+				"value": "0",
+				"function": "unBond",
+				"arguments": [],
+				"gasLimit": "80,000,000",
+				"gasPrice": "0"
+			},
+			"expect": {
+				"out": [ "*" ],
+				"status": "",
+				"refund": "*"
+			}
+		}`,
+			pfe.nextTxIndex(),
+			pfe.delegatorAddress(delegatorIndex),
+			pfe.delegationContractAddress,
+		))
+		if err != nil {
+			return err
 		}
-	}`,
-		pfe.nextTxIndex(),
-		string(pfe.delegatorAddress(delegatorIndex)),
-		string(pfe.delegationContractAddress),
-	))
-	if err != nil {
-		return err
+		unbondedSum = unbondedSum.Add(unbondedSum, big.NewInt(0).SetBytes(output.ReturnData[0]))
+		unbondable, err = pfe.getUserStakeOfType(delegatorIndex, UserUnbondable)
+		if err != nil {
+			return err
+		}
+		withdrawOnly, err := pfe.getUserStakeOfType(delegatorIndex, UserWithdrawOnly)
+		if err != nil {
+			return err
+		}
+		deferredPayment, err := pfe.getUserStakeOfType(delegatorIndex, UserDeferredPayment)
+		if err != nil {
+			return err
+		}
+
+		pfe.log("unBond, call #%d, delegator: %d, Still unbondable: %d, WithdrawOnly stake: %d. DeferredPayment: %d",
+			callIndex, delegatorIndex, unbondable, withdrawOnly, deferredPayment)
 	}
 
-	deferredPaymentAfter, err := pfe.getUserStakeOfType(delegatorIndex, UserDeferredPayment)
-	if err != nil {
-		return err
-	}
+	pfe.log("stake withdrawn %d", unbondedSum)
+	pfe.totalStakeWithdrawn.Add(pfe.totalStakeWithdrawn, unbondedSum)
 
-	deferredPaymentWithdrawn := big.NewInt(0).Sub(deferredPaymentBefore, deferredPaymentAfter)
-	stakeWithdrawn := big.NewInt(0).Add(deferredPaymentWithdrawn, withdrawOnly)
-
-	if output.ReturnCode == vmi.Ok {
-		pfe.log("unBond, delegator: %d", delegatorIndex)
-
-		if stakeWithdrawn.Cmp(big.NewInt(0)) > 0 {
-			_, err = pfe.executeTxStep(fmt.Sprintf(`
+	if unbondedSum.Cmp(big.NewInt(0)) > 0 {
+		_, err = pfe.executeTxStep(fmt.Sprintf(`
 		{
 			"step": "transfer",
 			"txId": "%d",
 			"tx": {
-				"from": "''%s",
-				"to": "''%s",
+				"from": "%s",
+				"to": "%s",
 				"value": "%d"
 			}
 		}`,
-				pfe.nextTxIndex(),
-				string(pfe.delegatorAddress(delegatorIndex)),
-				string(pfe.withdrawTargetAddress),
-				stakeWithdrawn,
-			))
-			if err != nil {
-				return err
-			}
+			pfe.nextTxIndex(),
+			pfe.delegatorAddress(delegatorIndex),
+			pfe.withdrawTargetAddress,
+			unbondedSum,
+		))
+		if err != nil {
+			return err
 		}
-
-		pfe.log("stake withdrawn %d", stakeWithdrawn)
-		pfe.totalStakeWithdrawn.Add(pfe.totalStakeWithdrawn, stakeWithdrawn)
-	} else {
-		pfe.log("unBond, delegator: %d, fail, %s", delegatorIndex, output.ReturnMessage)
 	}
 
 	pfe.printUserStakeByType(delegatorIndex)
@@ -169,20 +179,20 @@ func (pfe *fuzzDelegationExecutor) getUserStakeOfType(delegatorIndex int, fundTy
 		"step": "scCall",
 		"txId": "%d",
 		"tx": {
-			"from": "''%s",
-			"to": "''%s",
+			"from": "%s",
+			"to": "%s",
 			"value": "0",
 			"function": "%s",
-			"arguments": ["''%s"],
+			"arguments": ["%s"],
 			"gasLimit": "100,000,000",
 			"gasPrice": "0"
 		}
 	}`,
 		pfe.nextTxIndex(),
-		string(pfe.delegatorAddress(delegatorIndex)),
-		string(pfe.delegationContractAddress),
+		pfe.delegatorAddress(delegatorIndex),
+		pfe.delegationContractAddress,
 		fundType,
-		string(pfe.delegatorAddress(delegatorIndex)),
+		pfe.delegatorAddress(delegatorIndex),
 	))
 	if err != nil {
 		return nil, err
@@ -202,19 +212,19 @@ func (pfe *fuzzDelegationExecutor) printUserStakeByType(delegatorIndex int) {
 		"step": "scCall",
 		"txId": "%d",
 		"tx": {
-			"from": "''%s",
-			"to": "''%s",
+			"from": "%s",
+			"to": "%s",
 			"value": "0",
 			"function": "getUserStakeByType",
-			"arguments": ["''%s"],
+			"arguments": ["%s"],
 			"gasLimit": "100,000,000",
 			"gasPrice": "0"
 		}
 	}`,
 		pfe.nextTxIndex(),
-		string(pfe.ownerAddress),
-		string(pfe.delegationContractAddress),
-		string(pfe.delegatorAddress(delegatorIndex)),
+		pfe.ownerAddress,
+		pfe.delegationContractAddress,
+		pfe.delegatorAddress(delegatorIndex),
 	))
 	if err != nil {
 		pfe.log("getUserStakeByType error")
@@ -231,8 +241,8 @@ func (pfe *fuzzDelegationExecutor) printTotalStakeByType() {
 		"step": "scCall",
 		"txId": "%d",
 		"tx": {
-			"from": "''%s",
-			"to": "''%s",
+			"from": "%s",
+			"to": "%s",
 			"value": "0",
 			"function": "getTotalStakeByType",
 			"arguments": [],
@@ -241,8 +251,8 @@ func (pfe *fuzzDelegationExecutor) printTotalStakeByType() {
 		}
 	}`,
 		pfe.nextTxIndex(),
-		string(pfe.ownerAddress),
-		string(pfe.delegationContractAddress),
+		pfe.ownerAddress,
+		pfe.delegationContractAddress,
 	))
 	if err != nil {
 		pfe.log("getTotalStakeByType error")

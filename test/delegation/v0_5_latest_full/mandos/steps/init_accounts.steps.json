@@ -10,7 +10,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -60,7 +60,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

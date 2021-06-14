@@ -22,7 +22,7 @@
                 "contractCode": "file:../delegation.wasm",
                 "arguments": [
                     "10001",
-                    "''auction_contract______________s1",
+                    "sc:auction",
                     "680400"
                 ],
                 "gasLimit": "0x100000",

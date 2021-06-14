@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "10,001,000,010",
                     "storage": {
@@ -60,7 +60,7 @@
             "txId": "2",
             "tx": {
                 "from": "''someone_______________________s2",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "50,000"
             }
         },
@@ -69,7 +69,7 @@
             "txId": "3",
             "tx": {
                 "from": "''someone_______________________s2",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawUnexpectedBalance",
                 "arguments": [],

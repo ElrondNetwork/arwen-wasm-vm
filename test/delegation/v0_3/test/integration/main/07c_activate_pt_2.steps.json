@@ -6,7 +6,7 @@
             "txId": "check-node_state-7_1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -34,7 +34,7 @@
             "txId": "check-stake-by-type-7_0",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -58,7 +58,7 @@
             "txId": "check-stake-by-type-7_1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -82,7 +82,7 @@
             "txId": "check-stake-by-type-7_2",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -106,7 +106,7 @@
             "txId": "check-total-active-7",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalActiveStake",
                 "arguments": [],

@@ -7,7 +7,7 @@
             "comment": "total stake by type must be unchanged",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalStakeByType",
                 "arguments": [],
@@ -29,7 +29,7 @@
             "txId": "check-stake-by-type-11_1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -53,7 +53,7 @@
             "txId": "check-stake-by-type-11_3",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [

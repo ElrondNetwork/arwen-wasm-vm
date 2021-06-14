@@ -6,7 +6,7 @@
             "txId": "check-node_state-4_1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -34,7 +34,7 @@
             "txId": "check-stake-by-type-4_total",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalStakeByType",
                 "arguments": [],
@@ -56,7 +56,7 @@
             "txId": "check-stake-by-type-1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -80,7 +80,7 @@
             "txId": "4c-check-stake-delegator-2",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -104,7 +104,7 @@
             "txId": "check-total-active",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalActiveStake",
                 "arguments": [],
@@ -125,7 +125,7 @@
             "step": "checkState",
             "comment": "check that stake was sent",
             "accounts": {
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "*",
                     "balance": "0",
                     "storage": "*",

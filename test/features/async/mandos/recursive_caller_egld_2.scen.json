@@ -1,4 +1,5 @@
 {
+    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -15,7 +16,7 @@
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:recursive-caller": {
+                "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "1000",
                     "storage": {},
@@ -28,7 +29,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:a_user",
-                "to": "address:recursive-caller",
+                "to": "sc:recursive-caller",
                 "value": "0",
                 "function": "recursive_send_funds",
                 "arguments": [
@@ -37,7 +38,7 @@
                     "1",
                     "2"
                 ],
-                "gasLimit": "1,000,000",
+                "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -45,7 +46,7 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "address:recursive-caller",
+                        "address": "sc:recursive-caller",
                         "identifier": "str:recursive_send_funds",
                         "topics": [
                             "sc:vault",
@@ -59,12 +60,14 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
-                            "1"
+                            "str:FungibleESDT",
+                            "1",
+                            "0"
                         ],
                         "data": ""
                     },
                     {
-                        "address": "address:recursive-caller",
+                        "address": "sc:recursive-caller",
                         "identifier": "str:recursive_send_funds_callback",
                         "topics": [
                             "sc:vault",
@@ -74,7 +77,7 @@
                         "data": "2"
                     },
                     {
-                        "address": "address:recursive-caller",
+                        "address": "sc:recursive-caller",
                         "identifier": "str:recursive_send_funds",
                         "topics": [
                             "sc:vault",
@@ -88,12 +91,14 @@
                         "identifier": "str:accept_funds",
                         "topics": [
                             "str:EGLD",
-                            "1"
+                            "str:FungibleESDT",
+                            "1",
+                            "0"
                         ],
                         "data": ""
                     },
                     {
-                        "address": "address:recursive-caller",
+                        "address": "sc:recursive-caller",
                         "identifier": "str:recursive_send_funds_callback",
                         "topics": [
                             "sc:vault",
@@ -119,10 +124,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "2",
-                    "storage": {},
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "2"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
-                "address:recursive-caller": {
+                "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "998",
                     "storage": {},

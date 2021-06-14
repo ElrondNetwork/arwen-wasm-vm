@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "10000400010",
                     "storage": {
@@ -25,7 +25,7 @@
                         "''filled_stake": "500,000,000,100",
                         "''inactive_stake": "00000400000",
                         "''sent_rewards": "0",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''stake_state": "2",
                         "''bls_keys": "''bls_key_old_____________________________________________________________________________________",
                         "''user_id|''node_address__________________s1": "1",
@@ -50,7 +50,7 @@
             "txId": "1",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setBlsKeys",
                 "arguments": [
@@ -73,7 +73,7 @@
             "txId": "2",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getBlsKeys",
                 "arguments": [],
@@ -96,7 +96,7 @@
             "txId": "3",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNumBlsKeys",
                 "arguments": [],
@@ -122,7 +122,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "10000400010",
                     "storage": {
@@ -136,7 +136,7 @@
                         "''filled_stake": "500,000,000,100",
                         "''inactive_stake": "00000400000",
                         "''sent_rewards": "0",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''stake_state": "2",
                         "''bls_keys": "''bls_key_old_____________________________________________________________________________________",
                         "''user_id|''node_address__________________s1": "1",

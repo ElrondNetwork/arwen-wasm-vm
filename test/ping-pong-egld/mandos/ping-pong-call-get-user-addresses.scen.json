@@ -10,7 +10,7 @@
             "step": "scCall",
             "tx": {
                 "from": "address:participant1",
-                "to": "address:the_ping_pong_contract",
+                "to": "sc:ping-pong",
                 "value": "0",
                 "function": "getUserAddresses",
                 "arguments": [],

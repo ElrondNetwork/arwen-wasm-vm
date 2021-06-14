@@ -6,7 +6,7 @@
             "txId": "15-withdrawInactiveStake-1",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawInactiveStake",
                 "arguments": [
@@ -20,7 +20,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "topics": [
                             "''delegator_1___________________s1"
@@ -37,7 +37,7 @@
             "txId": "16-withdraw-check-1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -61,7 +61,7 @@
             "txId": "15-withdrawInactiveStake-2",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawInactiveStake",
                 "arguments": [
@@ -75,7 +75,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "topics": [
                             "''delegator_1___________________s1"
@@ -92,7 +92,7 @@
             "txId": "16-withdraw-check-2",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -116,7 +116,7 @@
             "txId": "15-withdrawInactiveStake-3",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawInactiveStake",
                 "arguments": [
@@ -130,7 +130,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "topics": [
                             "''delegator_1___________________s1"
@@ -147,7 +147,7 @@
             "txId": "16-withdraw-check-3",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -171,7 +171,7 @@
             "txId": "16-withdraw-check-total",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalStakeByType",
                 "arguments": [],

@@ -7,7 +7,7 @@
                 {
                     "creatorAddress": "address:node_address",
                     "creatorNonce": "0",
-                    "newAddress": "address:delegation_contract"
+                    "newAddress": "sc:delegation"
                 }
             ]
         },
@@ -19,7 +19,7 @@
                 "value": "0",
                 "contractCode": "file:../../output/delegation_latest_full.wasm",
                 "arguments": [
-                    "address:auction_contract",
+                    "sc:auction",
                     "5000",
                     "0",
                     "60",
@@ -42,7 +42,7 @@
             "txId": "setMinimumStake",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setMinimumStake",
                 "arguments": ["1,000,000,000"],

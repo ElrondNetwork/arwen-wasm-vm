@@ -6,7 +6,7 @@
             "txId": "increase-delegation-cap",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "modifyTotalDelegationCap",
                 "arguments": [
@@ -28,7 +28,7 @@
             "txId": "continue",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "continueGlobalOperation",
                 "arguments": [],

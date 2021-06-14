@@ -31,7 +31,7 @@
             "txId": "unstake not active ",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStakeNodes",
                 "arguments": [
@@ -55,7 +55,7 @@
             "txId": "check-nodes_state-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -83,7 +83,7 @@
             "txId": "unstake active",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStakeNodes",
                 "arguments": [
@@ -105,7 +105,7 @@
             "txId": "check-nodes_state-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -133,7 +133,7 @@
             "txId": "unBond active",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBondNodes",
                 "arguments": [
@@ -156,7 +156,7 @@
             "txId": "check-nodes_state-3",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -184,7 +184,7 @@
             "txId": "check-nodes_state-4",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -219,7 +219,7 @@
             "txId": "unBond unStaked",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBondNodes",
                 "arguments": [
@@ -241,7 +241,7 @@
             "txId": "check-nodes_state-5",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -267,7 +267,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "200,000,000,000,000",
                     "storage": "*",
@@ -281,7 +281,7 @@
             "txId": "unBond unStaked",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStakeNodes",
                 "arguments": [
@@ -310,7 +310,7 @@
             "txId": "unBond unStaked",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStakeNodes",
                 "arguments": [
@@ -332,7 +332,7 @@
             "txId": "check-nodes_state-6",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -360,7 +360,7 @@
             "txId": "unBond all possible",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBondAllPossibleNodes",
                 "arguments": [],
@@ -380,7 +380,7 @@
             "txId": "check-nodes_state-7",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -406,7 +406,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": "*",

@@ -28,7 +28,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["1,000,000,000"],
@@ -47,7 +47,7 @@
             "step": "validatorReward",
             "txId": "validatorReward-1",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "100,000,000"
             }
         },
@@ -56,7 +56,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["100,000,000,000,000"],
@@ -76,7 +76,7 @@
             "txId": "check-stake-by-type-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalStakeByType",
                 "arguments": [],
@@ -98,7 +98,7 @@
             "txId": "claimable-0",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -122,7 +122,7 @@
             "txId": "claimable-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -146,7 +146,7 @@
             "txId": "claimable-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -169,7 +169,7 @@
             "step": "validatorReward",
             "txId": "validatorReward-2",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "100,000,000"
             }
         },
@@ -178,7 +178,7 @@
             "txId": "claimable-3",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -202,7 +202,7 @@
             "txId": "claimable-4",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -226,7 +226,7 @@
             "txId": "claimable-5",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [

@@ -119,7 +119,7 @@ func checkBytesListPretty(jcbs []mj.JSONCheckBytes) string {
 			str += ", "
 		}
 
-		str += "\"" + oj.JSONString(jcb.Original) + "\""
+		str += oj.JSONString(jcb.Original)
 	}
 	return str + "]"
 }

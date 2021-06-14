@@ -24,7 +24,7 @@
             "txId": "delegator 1 stake",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "100,001,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -36,7 +36,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:delegator1"
@@ -53,7 +53,7 @@
             "txId": "delegator 2 stake 1",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "200,000,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -65,7 +65,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:delegator2"

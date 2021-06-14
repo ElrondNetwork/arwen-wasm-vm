@@ -102,7 +102,7 @@ func (p *Parser) processUint64(obj oj.OJsonObject) (mj.JSONUint64, error) {
 func (p *Parser) parseCheckBytes(obj oj.OJsonObject) (mj.JSONCheckBytes, error) {
 	if IsStar(obj) {
 		// "*" means any value, skip checking it
-		return mj.JSONCheckBytesExplicitStar(), nil
+		return mj.JSONCheckBytesStar(), nil
 	}
 
 	jb, err := p.processSubTreeAsByteArray(obj)

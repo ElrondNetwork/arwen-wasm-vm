@@ -53,6 +53,55 @@
                                 "ESDTRoleNFTBurn"
                             ],
                             "frozen": "false"
+                        },
+                        "str:6-NFTWithAttributes": {
+                            "instances": [
+                                {
+                                    "nonce": "1"
+                                },
+                                {
+                                    "nonce": "1",
+                                    "balance": "3"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "5",
+                                    "attributes": "str:MyCustomAttributes"
+                                }
+                            ]
+                        },
+                        "str:7-NFTWithPartialMetadata": {
+                            "instances": [
+                                {
+                                    "nonce": "1"
+                                },
+                                {
+                                    "nonce": "2",
+                                    "balance": "100",
+                                    "creator": "address:creator_address",
+                                    "hash": "keccak256:str:nft_hash",
+                                    "attributes": "str:attributes"
+                                }
+                            ]
+                        },
+                        "str:8-NFTWithFullMetadata": {
+                            "instances": [
+                                {
+                                    "nonce": "24",
+                                    "balance": "1"
+                                },
+                                {
+                                    "nonce": "25",
+                                    "balance": "1",
+                                    "creator": "address:other_creator_address",
+                                    "royalties": "5000",
+                                    "hash": "keccak256:str:other_nft_hash",
+                                    "uri": [
+                                        "str:www.something.com/funny.jpeg"
+                                    ],
+                                    "attributes": "str:other_attributes"
+                                }
+                            ]
                         }
                     },
                     "username": "str:myusername.elrond",
@@ -285,7 +334,7 @@
             "txId": "4",
             "comment": "system send out validator rewards",
             "tx": {
-                "to": "``delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "555,000,000"
             }
         },
@@ -334,7 +383,8 @@
                                 "ESDTRoleNFTBurn"
                             ],
                             "frozen": "false"
-                        }
+                        },
+                        "+": ""
                     },
                     "username": "str:check.elrond",
                     "storage": {},
@@ -358,7 +408,9 @@
                                 "u64:0",
                                 "``field2elem3"
                             ]
-                        }
+                        },
+                        "str:anything-goes": "*",
+                        "+": ""
                     },
                     "code": "file:smart-contract.wasm",
                     "owner": "address:bob"

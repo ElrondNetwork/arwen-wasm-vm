@@ -6,7 +6,7 @@
             "txId": "setAnyoneCanActivate",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setAnyoneCanActivate",
                 "arguments": [],
@@ -26,7 +26,7 @@
             "txId": "withdraw some stake to not affect the flow",
             "tx": {
                 "from": "''delegator_2___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawInactiveStake",
                 "arguments": [
@@ -40,7 +40,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000002",
                         "topics": [
                             "''delegator_2___________________s1"
@@ -58,7 +58,7 @@
             "comment": "BUG WARNING! Not all events get saved, stake event missing!!!",
             "tx": {
                 "from": "''delegator_2___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "1,000,000,000",
                 "function": "stakeAndTryActivate",
                 "arguments": [],
@@ -70,7 +70,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "''delegator_2___________________s1"
@@ -78,7 +78,7 @@
                         "data": "1,000,000,000"
                     },
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000003",
                         "topics": [],
                         "data": ""
@@ -93,7 +93,7 @@
             "txId": "activate-2-auto does nothing",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "stakeAllAvailable",
                 "arguments": [],

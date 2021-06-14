@@ -9,7 +9,6 @@ import (
 func JSONString(j OJsonObject) string {
 	var sb strings.Builder
 	j.writeJSON(&sb, 0)
-	sb.WriteString("\n")
 	return sb.String()
 }
 

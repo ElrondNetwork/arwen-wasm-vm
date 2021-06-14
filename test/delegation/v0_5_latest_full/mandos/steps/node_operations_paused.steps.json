@@ -6,7 +6,7 @@
             "txId": "stakeNodes paused",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "stakeNodes",
                 "arguments": [
@@ -32,7 +32,7 @@
             "txId": "unStakeNodes paused",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStakeNodes",
                 "arguments": [
@@ -55,7 +55,7 @@
             "txId": "unBondNodes paused",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBondNodes",
                 "arguments": [
@@ -78,7 +78,7 @@
             "txId": "unBondAllPossibleNodes paused",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBondAllPossibleNodes",
                 "arguments": [],

@@ -40,7 +40,7 @@
             "txId": "delegator 1 stake",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "5,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -60,7 +60,7 @@
             "txId": "get-total-stake",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "totalStake",
                 "arguments": [],
@@ -80,7 +80,7 @@
             "txId": "get-total-withdraw-only",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalWithdrawOnlyStake",
                 "arguments": [],
@@ -100,7 +100,7 @@
             "txId": "get-total-waiting-stake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalWaitingStake",
                 "arguments": [],
@@ -120,7 +120,7 @@
             "txId": "get-total-active-stake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalActiveStake",
                 "arguments": [],
@@ -140,7 +140,7 @@
             "txId": "get-total-unstaked-stake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalUnstakedStake",
                 "arguments": [],
@@ -160,7 +160,7 @@
             "txId": "get-total-deferred-stake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalDeferredPaymentStake",
                 "arguments": [],
@@ -188,7 +188,7 @@
             "txId": "get-user-unbondable",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUnBondable",
                 "arguments": ["address:delegator2"],
@@ -208,7 +208,7 @@
             "txId": "get-user-unstakeable",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUnStakeable",
                 "arguments": ["address:delegator2"],

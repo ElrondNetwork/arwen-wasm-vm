@@ -107,6 +107,31 @@ func (p *Parser) tryProcessESDTInstanceField(kvp *oj.OJsonKeyValuePair, targetIn
 		if err != nil {
 			return false, fmt.Errorf("invalid ESDT balance: %w", err)
 		}
+	case "creator":
+		targetInstance.Creator, err = p.processStringAsByteArray(kvp.Value)
+		if err != nil || len(targetInstance.Creator.Value) != 32 {
+			return false, fmt.Errorf("invalid ESDT NFT creator address: %w", err)
+		}
+	case "royalties":
+		targetInstance.Royalties, err = p.processUint64(kvp.Value)
+		if err != nil || targetInstance.Royalties.Value > 10000 {
+			return false, fmt.Errorf("invalid ESDT NFT royalties: %w", err)
+		}
+	case "hash":
+		targetInstance.Hash, err = p.processStringAsByteArray(kvp.Value)
+		if err != nil {
+			return false, fmt.Errorf("invalid ESDT NFT hash: %w", err)
+		}
+	case "uri":
+		targetInstance.Uri, err = p.processSubTreeAsByteArray(kvp.Value)
+		if err != nil {
+			return false, fmt.Errorf("invalid ESDT NFT URI: %w", err)
+		}
+	case "attributes":
+		targetInstance.Attributes, err = p.processStringAsByteArray(kvp.Value)
+		if err != nil {
+			return false, fmt.Errorf("invalid ESDT NFT attributes: %w", err)
+		}
 	default:
 		return false, nil
 	}

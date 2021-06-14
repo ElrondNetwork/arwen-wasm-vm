@@ -84,13 +84,17 @@ func (ae *ArwenTestExecutor) ExecuteSetStateStep(step *mj.SetStateStep) error {
 	}
 
 	// append accounts
-	for _, acct := range step.Accounts {
-		account, err := convertAccount(acct)
+	for _, mandosAccount := range step.Accounts {
+		worldAccount, err := convertAccount(mandosAccount)
+		if err != nil {
+			return err
+		}
+		err = validateSetStateAccount(mandosAccount, worldAccount)
 		if err != nil {
 			return err
 		}
 
-		ae.World.AcctMap.PutAccount(account)
+		ae.World.AcctMap.PutAccount(worldAccount)
 	}
 
 	// replace block info
@@ -99,6 +103,10 @@ func (ae *ArwenTestExecutor) ExecuteSetStateStep(step *mj.SetStateStep) error {
 	ae.World.Blockhashes = mj.JSONBytesFromStringValues(step.BlockHashes)
 
 	// append NewAddressMocks
+	err := validateNewAddressMocks(step.NewAddressMocks)
+	if err != nil {
+		return err
+	}
 	addressMocksToAdd := convertNewAddressMocks(step.NewAddressMocks)
 	ae.World.NewAddressMocks = append(ae.World.NewAddressMocks, addressMocksToAdd...)
 

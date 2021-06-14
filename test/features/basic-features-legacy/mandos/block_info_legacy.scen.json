@@ -6,7 +6,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -31,7 +31,7 @@
             "txId": "get_block_timestamp",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "get_block_timestamp",
                 "arguments": [],
@@ -51,7 +51,7 @@
             "txId": "get_block_nonce",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "get_block_nonce",
                 "arguments": [],
@@ -71,7 +71,7 @@
             "txId": "get_block_round",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "get_block_round",
                 "arguments": [],
@@ -91,7 +91,7 @@
             "txId": "get_block_epoch",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "get_block_epoch",
                 "arguments": [],

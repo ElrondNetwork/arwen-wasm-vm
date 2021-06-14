@@ -28,7 +28,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["200,000,000,000,000"],
@@ -47,7 +47,7 @@
             "step": "scQuery",
             "txId": "check-stake-by-type-1",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "function": "getUserStakeByType",
                 "arguments": [
                     "address:delegator1"
@@ -63,7 +63,7 @@
             "step": "scQuery",
             "txId": "check-stake-by-type-2",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "function": "getUserStakeByType",
                 "arguments": [
                     "address:delegator2"
@@ -79,7 +79,7 @@
             "step": "scQuery",
             "txId": "check-stake-by-type-total",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "function": "getTotalStakeByType",
                 "arguments": []
             },
@@ -95,7 +95,7 @@
             "txId": "partial-unBond-out-of-gas",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBond",
                 "arguments": [],
@@ -114,7 +114,7 @@
             "step": "scQuery",
             "txId": "check-stake-by-type-3a",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "function": "getUserStakeByType",
                 "arguments": [
                     "address:delegator2"
@@ -132,7 +132,7 @@
             "txId": "unBond-ok",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBond",
                 "arguments": [],
@@ -152,7 +152,7 @@
             "txId": "check-stake-by-type-3b",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -198,7 +198,7 @@
             "txId": "owner stake",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "199,999,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -210,7 +210,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:node_address"
@@ -235,7 +235,7 @@
             "txId": "unBond-more",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBond",
                 "arguments": [],
@@ -255,7 +255,7 @@
             "txId": "check-stake-by-type-4",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [

@@ -11,13 +11,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../auction-mock.wasm"
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -31,7 +31,7 @@
                         "''filled_stake": "789,000,000,000",
                         "''inactive_stake": "0",
                         "''sent_rewards": "0",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''stake_state": "0",
                         "''bls_keys": "",
                         "''user_id|''node_address__________________s1": "1",
@@ -67,7 +67,7 @@
             "txId": "1",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "activateGenesis",
                 "arguments": [],
@@ -79,7 +79,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000003",
                         "topics": [],
                         "data": "0x"
@@ -98,13 +98,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
                     "code": "file:../auction-mock.wasm"
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -118,7 +118,7 @@
                         "''filled_stake": "789,000,000,000",
                         "''inactive_stake": "",
                         "''sent_rewards": "0",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''stake_state": "2",
                         "''bls_keys": "",
                         "''user_id|''node_address__________________s1": "1",

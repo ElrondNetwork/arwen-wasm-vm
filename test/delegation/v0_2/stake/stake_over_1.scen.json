@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -48,7 +48,7 @@
             "txId": "1",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "789,000,000,001",
                 "function": "stake",
                 "arguments": [],
@@ -73,7 +73,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

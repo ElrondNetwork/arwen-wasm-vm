@@ -7,7 +7,7 @@
                 {
                     "creatorAddress": "''node_address__________________s1",
                     "creatorNonce": "0",
-                    "newAddress": "''delegation_contract___________s1"
+                    "newAddress": "sc:delegation"
                 }
             ]
         },
@@ -19,7 +19,7 @@
                 "value": "0",
                 "contractCode": "file:../../../output/delegation.wasm",
                 "arguments": [
-                    "''auction_contract______________s1",
+                    "sc:auction",
                     "1",
                     "0",
                     "50",
@@ -41,7 +41,7 @@
             "txId": "set-stake-per-node",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setStakePerNode",
                 "arguments": [
@@ -63,7 +63,7 @@
             "txId": "set-fee",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setServiceFee",
                 "arguments": [
@@ -85,7 +85,7 @@
             "txId": "enable-unstake",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "enableUnStake",
                 "arguments": [],

@@ -41,7 +41,7 @@
             "txId": "delegator 3 stake",
             "tx": {
                 "from": "address:delegator3",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "200,000,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -53,7 +53,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:delegator3"
@@ -77,7 +77,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["50,000,000,000,000"],
@@ -97,7 +97,7 @@
             "txId": "check-stake-by-type-A1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -121,7 +121,7 @@
             "txId": "check-stake-by-type-A2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -145,7 +145,7 @@
             "txId": "check-defered-payment-list-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserDeferredPaymentList",
                 "arguments": [
@@ -169,7 +169,7 @@
             "txId": "check-stake-by-type-A3",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -193,7 +193,7 @@
             "txId": "user-unstake-from-waiting+active",
             "tx": {
                 "from": "address:delegator3",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["150,000,000,000,000"],
@@ -213,7 +213,7 @@
             "txId": "check-stake-by-type-B3",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [

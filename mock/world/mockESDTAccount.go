@@ -2,6 +2,7 @@ package worldmock
 
 import (
 	"bytes"
+	"errors"
 	"math/big"
 
 	"github.com/ElrondNetwork/elrond-go/core"
@@ -88,6 +89,33 @@ func (a *Account) SetTokenBalance(tokenKey []byte, balance *big.Int) error {
 	}
 
 	tokenData.Value = balance
+	return a.SetTokenData(tokenKey, tokenData)
+}
+
+// GetTokenBalanceUint64 returns the ESDT balance of the account, specified by
+// the token key.
+func (a *Account) GetTokenBalanceUint64(tokenKey []byte) (uint64, error) {
+	tokenData, err := a.GetTokenData(tokenKey)
+	if err != nil {
+		return 0, err
+	}
+
+	return tokenData.Value.Uint64(), nil
+}
+
+// SetTokenBalanceUint64 sets the ESDT balance of the account, specified by the
+// token key.
+func (a *Account) SetTokenBalanceUint64(tokenKey []byte, balance uint64) error {
+	tokenData, err := a.GetTokenData(tokenKey)
+	if err != nil {
+		return err
+	}
+
+	if balance < 0 {
+		return data.ErrNegativeValue
+	}
+
+	tokenData.Value = big.NewInt(0).SetUint64(balance)
 	return a.SetTokenData(tokenKey, tokenData)
 }
 
@@ -249,18 +277,25 @@ func (a *Account) loadMockESDTDataInstance(tokenKey []byte) (string, *esdt.ESDig
 		return "", nil, err
 	}
 
+	tokenNameFromKey := GetTokenNameFromKey(tokenKey)
+
 	var tokenName string
 	if tokenInstance.TokenMetaData == nil || tokenInstance.TokenMetaData.Nonce == 0 {
 		// ESDT, no nonce in the key
-		tokenNameFromKey := GetTokenNameFromKey(tokenKey)
 		tokenInstance.TokenMetaData = &esdt.MetaData{
 			Name:  tokenNameFromKey,
 			Nonce: 0,
 		}
 		tokenName = string(tokenNameFromKey)
 	} else {
-		// the key also contains the nonce, we take the token identifier from the metadata
-		tokenName = string(tokenInstance.TokenMetaData.Name)
+		nonceAsBytes := big.NewInt(0).SetUint64(tokenInstance.TokenMetaData.Nonce).Bytes()
+		tokenNameLen := len(tokenNameFromKey) - len(nonceAsBytes)
+
+		if !bytes.Equal(nonceAsBytes, tokenNameFromKey[tokenNameLen:]) {
+			return "", nil, errors.New("Invalid key for NFT (key does not end in nonce)")
+		}
+
+		tokenName = string(tokenNameFromKey[:tokenNameLen])
 	}
 
 	return tokenName, tokenInstance, nil

@@ -17,12 +17,12 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:delegation_contract": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "``ELRONDreward": "888,000,000",
-                        "``auction_addr": "address:auction_contract",
+                        "``auction_addr": "sc:auction",
                         "``f|0x00000007": "0x04|0x00000002|0x00000007|0x0110d9316ec000|0x00000008|0x00000000|0x00000000|0x00000000",
                         "``f|0x00000008": "0x04|0x00000003|0x00000006|0x1e0369471000|0x00000009|0x00000007|0x00000000|0x00000000",
                         "``f|0x00000009": "0x04|0x00000004|0x00000006|0x64f43391f000|0x00000000|0x00000008|0x00000000|0x00000000",
@@ -83,7 +83,7 @@
             "txId": "genesis delegator stake",
             "tx": {
                 "from": "address:delegator_1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "7,777,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -95,7 +95,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:delegation_contract",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "address:delegator_1"
@@ -112,7 +112,7 @@
             "txId": "getFullWaitingList",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getFullWaitingList",
                 "arguments": [],

@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "789,000,000,000",
                     "storage": {
@@ -25,7 +25,7 @@
                         "''filled_stake": "789,000,000,000",
                         "''inactive_stake": "789,000,000,000",
                         "''sent_rewards": "0",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''stake_state": "0",
                         "''bls_keys": "''bls_key_1_______________________________________________________________________________________bls_key_2_______________________________________________________________________________________",
                         "''user_id|''node_address__________________s1": "1",
@@ -61,7 +61,7 @@
             "txId": "1",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "activate",
                 "arguments": [
@@ -88,14 +88,14 @@
                     "storage": {},
                     "code": ""
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "789,000,000,000",
                     "storage": {},
                     "code": "",
                     "asyncCallData": "str:stake@02@626c735f6b65795f315f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f@7369676e61747572655f315f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f@626c735f6b65795f325f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f@7369676e61747572655f325f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f"
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -109,7 +109,7 @@
                         "''filled_stake": "789,000,000,000",
                         "''inactive_stake": "789,000,000,000",
                         "''sent_rewards": "0",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''stake_state": "1",
                         "''bls_keys": "''bls_key_1_______________________________________________________________________________________bls_key_2_______________________________________________________________________________________",
                         "''user_id|''node_address__________________s1": "1",

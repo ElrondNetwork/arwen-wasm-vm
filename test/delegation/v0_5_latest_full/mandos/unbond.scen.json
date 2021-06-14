@@ -32,7 +32,7 @@
             "txId": "unBond-before",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBond",
                 "arguments": [],
@@ -52,7 +52,7 @@
             "txId": "check-stake-by-type-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -96,7 +96,7 @@
             "txId": "unBond-after",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBond",
                 "arguments": [],
@@ -116,7 +116,7 @@
             "txId": "check-stake-by-type-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [

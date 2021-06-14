@@ -25,6 +25,9 @@ const (
 
 	// StrHint hints that value should be a string expression, e.g. a username, "str:..."
 	StrHint
+
+	// CodeHint hints that value should be a smart contract code, normally loaded from a file
+	CodeHint
 )
 
 const maxBytesInterpretedAsNumber = 15
@@ -39,7 +42,9 @@ func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHin
 	case StrHint:
 		return fmt.Sprintf("str:%s", string(value))
 	case AddressHint:
-		return addressPretty((value))
+		return addressPretty(value)
+	case CodeHint:
+		return codePretty(value)
 	default:
 		return unknownByteArrayPretty(value)
 	}
@@ -55,7 +60,7 @@ func (er *ExprReconstructor) ReconstructFromUint64(value uint64) string {
 
 func unknownByteArrayPretty(bytes []byte) string {
 	if len(bytes) == 0 {
-		return "[]"
+		return ""
 	}
 
 	// fully interpret as string
@@ -118,4 +123,17 @@ func canInterpretAsString(bytes []byte) bool {
 		}
 	}
 	return true
+}
+
+func codePretty(bytes []byte) string {
+	if len(bytes) == 0 {
+		return ""
+	}
+	encoded := hex.EncodeToString(bytes)
+
+	if len(encoded) > 20 {
+		return fmt.Sprintf("0x%s...", encoded[:20])
+	}
+
+	return fmt.Sprintf("0x%s", encoded)
 }

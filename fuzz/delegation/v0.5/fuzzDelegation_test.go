@@ -15,7 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var fuzz = flag.Bool("fuzz", false, "fuzz")
+var fuzz = flag.Bool("fuzz", false, "Enable fuzz test")
+
+var seedFlag = flag.Int64("seed", 0, "Random seed, use it to replay fuzz scenarios")
+
+var iterationsFlag = flag.Int("iterations", 1000, "Number of iterations")
 
 func getTestRoot() string {
 	exePath, err := os.Getwd()
@@ -50,11 +54,15 @@ func TestFuzzDelegation_v0_5(t *testing.T) {
 	pfe := newExecutorWithPaths()
 	defer pfe.saveGeneratedScenario()
 
-	seed := time.Now().UnixNano()
-	// seed := int64(1617992497512090274) // to replay fuzzing scenario
+	var seed int64
+	if *seedFlag == 0 {
+		seed = time.Now().UnixNano()
+	} else {
+		seed = *seedFlag
+	}
 	pfe.log("Random seed: %d\n", seed)
 	r := rand.New(rand.NewSource(seed))
-	// r.Seed(seed)
+	r.Seed(seed)
 
 	stakePerNode := big.NewInt(1000000000)
 	numDelegators := 10
@@ -78,7 +86,7 @@ func TestFuzzDelegation_v0_5(t *testing.T) {
 	require.Nil(t, err)
 
 	re := fuzzutil.NewRandomEventProvider(r)
-	for stepIndex := 0; stepIndex < 1500; stepIndex++ {
+	for stepIndex := 0; stepIndex < *iterationsFlag; stepIndex++ {
 		generateRandomEvent(t, pfe, r, re, maxDelegationCap)
 	}
 
@@ -144,7 +152,7 @@ func TestFuzzDelegation_v0_5(t *testing.T) {
 
 	activeAndWithdrawn := big.NewInt(0).Add(withdrawnAtTheEnd, totalActiveStake)
 	require.True(t, activeAndWithdrawn.Cmp(pfe.totalStakeAdded) == 0,
-		"Stake added and withdrawn doesn't match. Staked: %d. Withdrawn: %d. Off by: %d",
+		"Stake added and withdrawn doesn't match. Staked: %d. Active+Withdrawn: %d. Off by: %d",
 		pfe.totalStakeAdded, activeAndWithdrawn,
 		big.NewInt(0).Sub(pfe.totalStakeAdded, activeAndWithdrawn))
 }

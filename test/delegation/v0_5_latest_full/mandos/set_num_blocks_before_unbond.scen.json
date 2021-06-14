@@ -15,7 +15,7 @@
             "txId": "-getNumBlocksBeforeUnBond-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNumBlocksBeforeUnBond",
                 "arguments": [],
@@ -35,7 +35,7 @@
             "txId": "-setNumBlocksBeforeUnBond-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setNumBlocksBeforeUnBond",
                 "arguments": [
@@ -57,7 +57,7 @@
             "txId": "-getNumBlocksBeforeUnBond-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNumBlocksBeforeUnBond",
                 "arguments": [],

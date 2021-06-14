@@ -30,7 +30,7 @@
             "step": "checkState",
             "comment": "check that stake was sent",
             "accounts": {
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "300,000,000,000,000",
                     "storage": "*",
@@ -53,7 +53,7 @@
             "txId": "unJail inactive nodes",
             "tx": {
                 "from":  "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "1,000,000,000",
                 "function": "unJailNodes",
                 "arguments": [
@@ -77,7 +77,7 @@
             "txId": "unJail unknown nodes",
             "tx": {
                 "from":  "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "1,000,000,000",
                 "function": "unJailNodes",
                 "arguments": [
@@ -101,7 +101,7 @@
             "txId": "unJail nodes",
             "tx": {
                 "from":  "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "1,000,000,000",
                 "function": "unJailNodes",
                 "arguments": [
@@ -123,7 +123,7 @@
             "step": "checkState",
             "comment": "check that stake was sent",
             "accounts": {
-                "address:auction_contract": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "300,001,000,000,000",
                     "storage": "*",

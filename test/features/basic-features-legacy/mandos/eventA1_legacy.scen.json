@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {},
@@ -24,7 +24,7 @@
             "txId": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "address:features_contract",
+                "to": "sc:basic-features",
                 "value": "0",
                 "function": "logEventA",
                 "arguments": [
@@ -38,7 +38,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "address:features_contract",
+                        "address": "sc:basic-features",
                         "identifier": "0x0123456789abcdef0123456789abcdef0123456789abcdef000000000000000a",
                         "topics": [],
                         "data": "0"
@@ -51,7 +51,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:features_contract": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0x100",
                     "storage": {},

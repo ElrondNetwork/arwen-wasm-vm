@@ -13,7 +13,7 @@
             "txId": "force-unstake-too-soon",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": [],

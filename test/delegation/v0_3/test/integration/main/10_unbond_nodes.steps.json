@@ -13,7 +13,7 @@
             "txId": "unBondNodes-1",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBondNodes",
                 "arguments": [
@@ -27,7 +27,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000007",
                         "topics": [],
                         "data": "0x"

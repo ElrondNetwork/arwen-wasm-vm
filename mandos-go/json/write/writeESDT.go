@@ -75,6 +75,21 @@ func appendESDTInstanceToOJ(esdtInstance *mj.ESDTInstance, targetOj *oj.OJsonMap
 	if len(esdtInstance.Balance.Original) > 0 {
 		targetOj.Put("balance", bigIntToOJ(esdtInstance.Balance))
 	}
+	if len(esdtInstance.Creator.Original) > 0 {
+		targetOj.Put("creator", bytesFromStringToOJ(esdtInstance.Creator))
+	}
+	if len(esdtInstance.Royalties.Original) > 0 {
+		targetOj.Put("royalties", uint64ToOJ(esdtInstance.Royalties))
+	}
+	if len(esdtInstance.Hash.Original) > 0 {
+		targetOj.Put("hash", bytesFromStringToOJ(esdtInstance.Hash))
+	}
+	if len(esdtInstance.Uri.Value) > 0 {
+		targetOj.Put("uri", bytesFromTreeToOJ(esdtInstance.Uri))
+	}
+	if len(esdtInstance.Attributes.Original) > 0 {
+		targetOj.Put("attributes", bytesFromStringToOJ(esdtInstance.Attributes))
+	}
 }
 
 func isCompactESDT(esdtItem *mj.ESDTData) bool {

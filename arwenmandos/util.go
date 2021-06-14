@@ -2,6 +2,7 @@ package arwenmandos
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 
 	mj "github.com/ElrondNetwork/arwen-wasm-vm/mandos-go/json/model"
@@ -55,8 +56,13 @@ func convertAccount(testAcct *mj.Account) (*worldmock.Account, error) {
 				Type:       uint32(core.Fungible),
 				Properties: makeESDTUserMetadataBytes(isFrozen),
 				TokenMetaData: &esdt.MetaData{
-					Name:  tokenName,
-					Nonce: tokenNonce,
+					Name:       tokenName,
+					Nonce:      tokenNonce,
+					Creator:    instance.Creator.Value,
+					Royalties:  uint32(instance.Royalties.Value),
+					Hash:       instance.Hash.Value,
+					URIs:       [][]byte{instance.Uri.Value},
+					Attributes: instance.Attributes.Value,
 				},
 			}
 			err := account.SetTokenData(tokenKey, tokenData)
@@ -77,12 +83,34 @@ func convertAccount(testAcct *mj.Account) (*worldmock.Account, error) {
 	return account, nil
 }
 
+func validateSetStateAccount(mandosAccount *mj.Account, converted *worldmock.Account) error {
+	err := converted.Validate()
+	if err != nil {
+		return fmt.Errorf(
+			`"setState" step validation failed for account "%s": %w`,
+			mandosAccount.Address.Original,
+			err)
+	}
+	return nil
+}
+
 func makeESDTUserMetadataBytes(frozen bool) []byte {
 	metadata := &builtInFunctions.ESDTUserMetadata{
 		Frozen: frozen,
 	}
 
 	return metadata.ToBytes()
+}
+
+func validateNewAddressMocks(testNAMs []*mj.NewAddressMock) error {
+	for _, testNAM := range testNAMs {
+		if !worldmock.IsSmartContractAddress(testNAM.NewAddress.Value) {
+			return fmt.Errorf(
+				`address in "setState" "newAddresses" field should have SC format: %s`,
+				testNAM.NewAddress.Original)
+		}
+	}
+	return nil
 }
 
 func convertNewAddressMocks(testNAMs []*mj.NewAddressMock) []*worldmock.NewAddressMock {

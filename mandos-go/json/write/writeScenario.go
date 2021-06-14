@@ -8,7 +8,7 @@ import (
 // ScenarioToJSONString converts a scenario object to its JSON representation.
 func ScenarioToJSONString(scenario *mj.Scenario) string {
 	jobj := ScenarioToOrderedJSON(scenario)
-	return oj.JSONString(jobj)
+	return oj.JSONString(jobj) + "\n"
 }
 
 // ScenarioToOrderedJSON converts a scenario object to an ordered JSON object.

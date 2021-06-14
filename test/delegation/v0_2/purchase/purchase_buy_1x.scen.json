@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "10000400010",
                     "storage": {
@@ -53,7 +53,7 @@
             "txId": "1",
             "tx": {
                 "from": "''delegator_2___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "40,000,000,002",
                 "function": "purchaseStake",
                 "arguments": [
@@ -67,7 +67,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000009",
                         "topics": [
                             "''delegator_1___________________s1",
@@ -89,7 +89,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "10000400010",
                     "storage": {

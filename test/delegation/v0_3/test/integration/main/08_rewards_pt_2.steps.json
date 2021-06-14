@@ -6,7 +6,7 @@
             "txId": "validatorReward-2",
             "comment": "reward value proportional to stake to make it easier to check, 50% are fees",
             "tx": {
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "888,000,000"
             }
         },
@@ -16,7 +16,7 @@
             "comment": "666,000,000 + 888,000,000",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalCumulatedRewards",
                 "arguments": [],
@@ -39,7 +39,7 @@
             "comment": "50% * 666,000,000 + 50% * 888,000,000 + delegation reward",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -63,7 +63,7 @@
             "txId": "claimable-8_1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -87,7 +87,7 @@
             "txId": "claimable-8_2",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [

@@ -27,7 +27,7 @@
             "txId": "isBootstrapMode?",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "isBootstrapMode",
                 "arguments": [],
@@ -47,7 +47,7 @@
             "txId": "continue global operation with no operation in progress",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "continueGlobalOperation",
                 "arguments": [],
@@ -67,7 +67,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],
@@ -87,7 +87,7 @@
             "txId": "-get-total-delegation-cap-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalDelegationCap",
                 "arguments": [],
@@ -107,7 +107,7 @@
             "txId": "-set-service-fee-out-of-gas-1",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setServiceFee",
                 "arguments": [
@@ -129,7 +129,7 @@
             "txId": "-set-total-delegation-cap-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "modifyTotalDelegationCap",
                 "arguments": [
@@ -152,7 +152,7 @@
             "txId": "-set-service-fee-2",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setServiceFee",
                 "arguments": [
@@ -175,7 +175,7 @@
             "txId": "continue-out-of-gas",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "continueGlobalOperation",
                 "arguments": [],
@@ -199,7 +199,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],
@@ -219,7 +219,7 @@
             "txId": "continue",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "continueGlobalOperation",
                 "arguments": [],
@@ -239,7 +239,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],
@@ -259,7 +259,7 @@
             "txId": "-get-total-delegation-cap-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalDelegationCap",
                 "arguments": [],
@@ -279,7 +279,7 @@
             "txId": "-set-total-delegation-cap-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "modifyTotalDelegationCap",
                 "arguments": [
@@ -301,7 +301,7 @@
             "txId": "-get-total-delegation-cap-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalDelegationCap",
                 "arguments": [],

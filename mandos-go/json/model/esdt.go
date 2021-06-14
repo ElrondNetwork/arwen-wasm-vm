@@ -9,9 +9,13 @@ type ESDTTxData struct {
 
 // ESDTInstance models an instance of an NFT/SFT, with its own nonce
 type ESDTInstance struct {
-	Nonce   JSONUint64
-	Balance JSONBigInt
-	Uri     JSONBytesFromTree
+	Nonce      JSONUint64
+	Balance    JSONBigInt
+	Creator    JSONBytesFromString
+	Royalties  JSONUint64
+	Hash       JSONBytesFromString
+	Uri        JSONBytesFromTree
+	Attributes JSONBytesFromString
 }
 
 // ESDTData models an account holding an ESDT token
@@ -25,9 +29,26 @@ type ESDTData struct {
 
 // CheckESDTInstance checks an instance of an NFT/SFT, with its own nonce
 type CheckESDTInstance struct {
-	Nonce   JSONCheckUint64
-	Balance JSONCheckBigInt
-	Uri     JSONCheckBytes
+	Nonce      JSONCheckUint64
+	Balance    JSONCheckBigInt
+	Creator    JSONCheckBytes
+	Royalties  JSONCheckUint64
+	Hash       JSONCheckBytes
+	Uri        JSONCheckBytes
+	Attributes JSONCheckBytes
+}
+
+// NewCheckESDTInstance creates an instance with all fields unspecified.
+func NewCheckESDTInstance() *CheckESDTInstance {
+	return &CheckESDTInstance{
+		Nonce:      JSONCheckUint64Unspecified(),
+		Balance:    JSONCheckBigIntUnspecified(),
+		Creator:    JSONCheckBytesUnspecified(),
+		Royalties:  JSONCheckUint64Unspecified(),
+		Hash:       JSONCheckBytesUnspecified(),
+		Uri:        JSONCheckBytesUnspecified(),
+		Attributes: JSONCheckBytesUnspecified(),
+	}
 }
 
 // CheckESDTData checks the ESDT tokens held by an account

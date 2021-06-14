@@ -77,25 +77,17 @@
             }
         },
         {
-            "step": "scCall",
+            "step": "scQuery",
             "txId": "resolve-coolname0001",
             "tx": {
-                "from": "address:viewer",
                 "to": "sc:dns#87",
-                "value": "0",
                 "function": "resolve",
                 "arguments": [
                     "str:coolname0001.elrond"
-                ],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
+                ]
             },
             "expect": {
-                "out": [ "address:cool_address" ],
-                "status": "",
-                "logs": [],
-                "gas": "*",
-                "refund": "*"
+                "out": [ "address:cool_address" ]
             }
         },
         {

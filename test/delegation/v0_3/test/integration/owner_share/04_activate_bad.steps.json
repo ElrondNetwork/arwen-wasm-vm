@@ -6,7 +6,7 @@
             "txId": "activate-1",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "stakeNodes",
                 "arguments": [

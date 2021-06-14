@@ -14,7 +14,7 @@ func (p *Parser) parseAccountAddress(addrRaw string) (mj.JSONBytesFromString, er
 	}
 	addrBytes, err := p.ExprInterpreter.InterpretString(addrRaw)
 	if err == nil && len(addrBytes) != 32 {
-		return mj.JSONBytesFromString{}, errors.New("account addressis not 32 bytes in length")
+		return mj.JSONBytesFromString{}, errors.New("account address is not 32 bytes in length")
 	}
 	return mj.NewJSONBytesFromString(addrBytes, addrRaw), err
 }
@@ -25,7 +25,20 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 		return nil, errors.New("unmarshalled account object is not a map")
 	}
 
-	acct := mj.Account{}
+	acct := mj.Account{
+		Shard:           mj.JSONUint64Zero(),
+		IsSmartContract: false,
+		Comment:         "",
+		Nonce:           mj.JSONUint64Zero(),
+		Balance:         mj.JSONBigIntZero(),
+		Username:        mj.NewJSONBytesFromString(nil, ""),
+		Storage:         nil,
+		Code:            mj.NewJSONBytesFromString(nil, ""),
+		Owner:           mj.NewJSONBytesFromString(nil, ""),
+		AsyncCallData:   "",
+		ESDTData:        nil,
+	}
+
 	var err error
 
 	for _, kvp := range acctMap.OrderedKV {

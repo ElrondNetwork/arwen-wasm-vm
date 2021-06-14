@@ -8,7 +8,7 @@ import (
 // TestToJSONString converts a test object to its JSON representation.
 func TestToJSONString(testTopLevel []*mj.Test) string {
 	jobj := TestToOrderedJSON(testTopLevel)
-	return oj.JSONString(jobj)
+	return oj.JSONString(jobj) + "\n"
 }
 
 // TestToOrderedJSON converts a test object to an ordered JSON object.

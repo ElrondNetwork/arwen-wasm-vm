@@ -17,7 +17,7 @@
                 {
                     "creatorAddress": "address:owner",
                     "creatorNonce": "5",
-                    "newAddress": "address:adder_address"
+                    "newAddress": "sc:adder"
                 }
             ]
         },
@@ -46,7 +46,7 @@
             "step": "scQuery",
             "txId": "2",
             "tx": {
-                "to": "address:adder_address",
+                "to": "sc:adder",
                 "function": "getSum",
                 "arguments": []
             },
@@ -63,7 +63,7 @@
             "txId": "3",
             "tx": {
                 "from": "address:owner",
-                "to": "address:adder_address",
+                "to": "sc:adder",
                 "value": "0",
                 "function": "add",
                 "arguments": [
@@ -89,7 +89,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "address:adder_address": {
+                "sc:adder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

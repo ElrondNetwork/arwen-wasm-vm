@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-// SCAddressNumLeadingZeros is the number of zer obytes every smart contract address begins with
+// SCAddressNumLeadingZeros is the number of zero bytes every smart contract address begins with.
 const SCAddressNumLeadingZeros = 8
 
 // Keccak256 cryptographic function

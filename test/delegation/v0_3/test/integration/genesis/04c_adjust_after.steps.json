@@ -6,7 +6,7 @@
             "txId": "add removed node back",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "addNodes",
                 "arguments": [
@@ -29,7 +29,7 @@
             "txId": "delegator 2 re-stake (adjust after genesis)",
             "tx": {
                 "from": "''delegator_2___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "1,000,000,000",
                 "function": "stake",
                 "arguments": [],
@@ -41,7 +41,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000001",
                         "topics": [
                             "''delegator_2___________________s1"
@@ -58,7 +58,7 @@
             "txId": "simulate funds being set up correctly at genesis",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''auction_contract______________s1",
+                "to": "sc:auction",
                 "value": "300,000,000,000,000"
             }
         },
@@ -67,7 +67,7 @@
             "txId": "simulate funds being set up correctly at genesis",
             "tx": {
                 "from": "''delegator_2___________________s1",
-                "to": "''auction_contract______________s1",
+                "to": "sc:auction",
                 "value": "033,000,000,000,000"
             }
         }

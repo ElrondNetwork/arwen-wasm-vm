@@ -1,0 +1,28 @@
+{
+    "name": "check version",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:delegation": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/dns.wasm"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "txId": "version",
+            "tx": {
+                "to": "sc:delegation",
+                "function": "version"
+            },
+            "expect": {
+                "out": [ "str:0.3.1" ]
+            }
+        }
+    ]
+}

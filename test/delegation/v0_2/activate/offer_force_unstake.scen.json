@@ -11,7 +11,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "789,000,000,000",
                     "storage": {
@@ -25,12 +25,12 @@
                     },
                     "code": "file:../auction-mock.wasm"
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "''owner": "''node_address__________________s1",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''time_before_force_unstake": "680400",
                         
                         "''num_nodes": "2",
@@ -79,7 +79,7 @@
             "txId": "1-offer",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "offerStakeForSale",
                 "arguments": [
@@ -108,7 +108,7 @@
             "txId": "2-force-unstake!",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "forceUnstake",
                 "arguments": [],
@@ -120,7 +120,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000005",
                         "topics": [],
                         "data": ""
@@ -139,7 +139,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "789,000,000,000",
                     "storage": {
@@ -157,12 +157,12 @@
                     },
                     "code": "file:../auction-mock.wasm"
                 },
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "''owner": "''node_address__________________s1",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''time_before_force_unstake": "680400",
                         
                         "''num_nodes": "2",

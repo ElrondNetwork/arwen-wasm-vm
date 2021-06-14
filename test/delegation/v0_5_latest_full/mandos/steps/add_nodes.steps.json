@@ -6,7 +6,7 @@
             "txId": "add nodes",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "addNodes",
                 "arguments": [
@@ -41,7 +41,7 @@
             "txId": "check-node_state-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -69,7 +69,7 @@
             "txId": "rem nodes",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "removeNodes",
                 "arguments": [
@@ -93,7 +93,7 @@
             "txId": "check-node_state-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -121,7 +121,7 @@
             "txId": "check signature",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNodeSignature",
                 "arguments": [
@@ -143,7 +143,7 @@
             "txId": "check signature for node that doesn't exist",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getNodeSignature",
                 "arguments": [
@@ -165,7 +165,7 @@
             "txId": "rem nodes bad 1",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "removeNodes",
                 "arguments": [
@@ -189,7 +189,7 @@
             "txId": "rem nodes bad 2",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "removeNodes",
                 "arguments": [

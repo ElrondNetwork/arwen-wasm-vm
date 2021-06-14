@@ -6,7 +6,7 @@
             "txId": "slip some ERD directly into the contract",
             "tx": {
                 "from": "''endless_sack_of_erd___________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "1,234,567,000,000"
             }
         },
@@ -15,7 +15,7 @@
             "txId": "check-unexpected-balance",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUnexpectedBalance",
                 "arguments": [],
@@ -35,7 +35,7 @@
             "txId": "withdraw-unexpected-balance",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "withdrawUnexpectedBalance",
                 "arguments": [],
@@ -55,7 +55,7 @@
             "txId": "check-unexpected-balance-after-withdraw",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUnexpectedBalance",
                 "arguments": [],

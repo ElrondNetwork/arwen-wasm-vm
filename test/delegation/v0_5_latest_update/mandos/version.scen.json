@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "address:delegation_contract": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
@@ -17,7 +17,7 @@
             "step": "scQuery",
             "txId": "version",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "function": "version"
             },
             "expect": {

@@ -56,3 +56,11 @@ type JSONUint64 struct {
 	Value    uint64
 	Original string
 }
+
+// JSONUint64Zero provides an unitialized zero value.
+func JSONUint64Zero() JSONUint64 {
+	return JSONUint64{
+		Value:    0,
+		Original: "",
+	}
+}

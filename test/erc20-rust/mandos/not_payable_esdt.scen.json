@@ -14,7 +14,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "``busd__________________________s1": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
@@ -30,7 +30,7 @@
             "txId": "1",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
                     "value": "1"
@@ -54,7 +54,7 @@
             "txId": "2",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
                     "value": "1"
@@ -80,7 +80,7 @@
             "txId": "3",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
                     "value": "1"
@@ -107,7 +107,7 @@
             "txId": "4",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
                     "value": "1"
@@ -134,7 +134,7 @@
             "txId": "5",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
                     "value": "1"
@@ -161,7 +161,7 @@
             "txId": "6",
             "tx": {
                 "from": "``account_1_____________________s1",
-                "to": "``busd__________________________s1",
+                "to": "sc:erc20",
                 "esdt": {
                     "tokenIdentifier": "str:ANY_TOKEN",
                     "value": "1"
@@ -196,7 +196,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "``busd__________________________s1": {
+                "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

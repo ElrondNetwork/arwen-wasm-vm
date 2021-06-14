@@ -6,7 +6,7 @@
             "txId": "pause staking",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "pauseStaking",
                 "arguments": [],
@@ -26,7 +26,7 @@
             "txId": "attempt to stake while paused",
             "tx": {
                 "from": "''endless_sack_of_erd___________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "1234567890",
                 "function": "stake",
                 "arguments": [],
@@ -47,7 +47,7 @@
             "txId": "unpause staking",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unpauseStaking",
                 "arguments": [],

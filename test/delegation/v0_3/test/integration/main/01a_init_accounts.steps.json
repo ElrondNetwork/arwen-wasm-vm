@@ -10,7 +10,7 @@
                     "storage": {},
                     "code": ""
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {

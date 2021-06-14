@@ -6,7 +6,7 @@
             "txId": "validatorReward-1",
             "comment": "reward value proportional to stake to make it easier to check, 50% are fees",
             "tx": {
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "888,000,000"
             }
         },
@@ -15,7 +15,7 @@
             "txId": "get-total-cumulated-1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalCumulatedRewards",
                 "arguments": [],
@@ -37,7 +37,7 @@
             "txId": "claimable-0",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -61,7 +61,7 @@
             "txId": "claimable-1",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -85,7 +85,7 @@
             "txId": "claimable-2",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -109,7 +109,7 @@
             "txId": "delegator 1 claim 1",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "claimRewards",
                 "arguments": [],
@@ -121,7 +121,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x000000000000000000000000000000000000000000000000000000000000000a",
                         "topics": [
                             "''delegator_1___________________s1"
@@ -137,7 +137,7 @@
             "step": "checkState",
             "comment": "check that rewards were received",
             "accounts": {
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "comment": "inactive stake (1,000,000) + unclaimed rewards",
                     "nonce": "*",
                     "balance": "588,000,000",

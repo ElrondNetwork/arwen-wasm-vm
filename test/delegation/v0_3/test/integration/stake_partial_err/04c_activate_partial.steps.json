@@ -6,7 +6,7 @@
             "txId": "check-node_state-4_1-partial-fail",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -34,7 +34,7 @@
             "txId": "check-stake-by-type-1-partial-fail",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -58,7 +58,7 @@
             "txId": "check-stake-by-type-2-partial-fail",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [
@@ -82,7 +82,7 @@
             "txId": "check-total-active-partial-fail",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalActiveStake",
                 "arguments": [],
@@ -103,13 +103,13 @@
             "step": "checkState",
             "comment": "check that stake was sent",
             "accounts": {
-                "''delegation_contract___________s1": {
+                "sc:delegation": {
                     "nonce": "*",
                     "balance": "1,000,000,000",
                     "storage": "*",
                     "code": "file:../../../output/delegation.wasm"
                 },
-                "''auction_contract______________s1": {
+                "sc:auction": {
                     "nonce": "0",
                     "balance": "333,000,000,000,000",
                     "storage": "*",

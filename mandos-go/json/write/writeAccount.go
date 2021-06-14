@@ -57,7 +57,8 @@ func checkAccountsToOJ(checkAccounts *mj.CheckAccounts) oj.OJsonObject {
 			acctOJ.Put("esdt", stringToOJ("*"))
 		} else {
 			if len(checkAccount.CheckESDTData) > 0 {
-				acctOJ.Put("esdt", checkESDTDataToOJ(checkAccount.CheckESDTData))
+				acctOJ.Put("esdt", checkESDTDataToOJ(
+					checkAccount.CheckESDTData, checkAccount.MoreESDTTokensAllowed))
 			}
 		}
 		if !checkAccount.Username.IsUnspecified() {
@@ -68,7 +69,10 @@ func checkAccountsToOJ(checkAccounts *mj.CheckAccounts) oj.OJsonObject {
 		} else {
 			storageOJ := oj.NewMap()
 			for _, st := range checkAccount.CheckStorage {
-				storageOJ.Put(bytesFromStringToString(st.Key), bytesFromTreeToOJ(st.Value))
+				storageOJ.Put(bytesFromStringToString(st.Key), checkBytesToOJ(st.CheckValue))
+			}
+			if checkAccount.MoreStorageAllowed {
+				storageOJ.Put("+", stringToOJ(""))
 			}
 			acctOJ.Put("storage", storageOJ)
 		}
@@ -85,7 +89,7 @@ func checkAccountsToOJ(checkAccounts *mj.CheckAccounts) oj.OJsonObject {
 		acctsOJ.Put(bytesFromStringToString(checkAccount.Address), acctOJ)
 	}
 
-	if checkAccounts.OtherAccountsAllowed {
+	if checkAccounts.MoreAccountsAllowed {
 		acctsOJ.Put("+", stringToOJ(""))
 	}
 

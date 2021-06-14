@@ -13,7 +13,7 @@
             "txId": "offer-2",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "announceUnStake",
                 "arguments": [
@@ -35,7 +35,7 @@
             "txId": "check-stake-offer",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getStakeForSale",
                 "arguments": [
@@ -57,7 +57,7 @@
             "txId": "check-stake-offer-time",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getStakeForSaleCreationNonces",
                 "arguments": [
@@ -89,7 +89,7 @@
             "txId": "1",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "1,000,000,000,000",
                 "function": "purchaseStake",
                 "arguments": [
@@ -103,7 +103,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000009",
                         "topics": [
                             "''delegator_1___________________s1",

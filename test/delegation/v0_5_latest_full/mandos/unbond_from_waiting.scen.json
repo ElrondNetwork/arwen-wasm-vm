@@ -28,7 +28,7 @@
             "txId": "withdraw-inactive-stake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["1,000,000,000"],
@@ -48,7 +48,7 @@
             "txId": "check-stake-by-type-total",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalStakeByType",
                 "arguments": [],
@@ -70,7 +70,7 @@
             "txId": "unBond",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unBond",
                 "arguments": [],
@@ -90,7 +90,7 @@
             "txId": "check-stake-by-type-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [

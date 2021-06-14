@@ -60,11 +60,43 @@ func (ae *ArwenTestExecutor) convertMockAccountToMandosFormat(account *worldmock
 
 		var mandosInstances []*mj.ESDTInstance
 		for _, mockInstance := range esdtObj.Instances {
+			var creator mj.JSONBytesFromString
+			if len(mockInstance.TokenMetaData.Creator) > 0 {
+				creator = mj.JSONBytesFromString{
+					Value:    mockInstance.TokenMetaData.Creator,
+					Original: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.Creator, er.AddressHint),
+				}
+			}
+
+			var royalties mj.JSONUint64
+			if mockInstance.TokenMetaData.Royalties > 0 {
+				royalties = mj.JSONUint64{
+					Value:    uint64(mockInstance.TokenMetaData.Royalties),
+					Original: ae.exprReconstructor.ReconstructFromUint64(uint64(mockInstance.TokenMetaData.Royalties)),
+				}
+			}
+
+			var hash mj.JSONBytesFromString
+			if len(mockInstance.TokenMetaData.Hash) > 0 {
+				hash = mj.JSONBytesFromString{
+					Value:    mockInstance.TokenMetaData.Hash,
+					Original: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.Hash, er.NoHint),
+				}
+			}
+
 			var uri mj.JSONBytesFromTree
 			if len(mockInstance.TokenMetaData.URIs) > 0 {
 				uri = mj.JSONBytesFromTree{
 					Value:    mockInstance.TokenMetaData.URIs[0],
 					Original: &oj.OJsonString{Value: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.URIs[0], er.NoHint)},
+				}
+			}
+
+			var attributes mj.JSONBytesFromString
+			if len(mockInstance.TokenMetaData.Attributes) > 0 {
+				attributes = mj.JSONBytesFromString{
+					Value:    mockInstance.TokenMetaData.Attributes,
+					Original: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.Attributes, er.NoHint),
 				}
 			}
 
@@ -77,7 +109,11 @@ func (ae *ArwenTestExecutor) convertMockAccountToMandosFormat(account *worldmock
 					Value:    mockInstance.Value,
 					Original: ae.exprReconstructor.ReconstructFromBigInt(mockInstance.Value),
 				},
-				Uri: uri,
+				Creator:    creator,
+				Royalties:  royalties,
+				Hash:       hash,
+				Uri:        uri,
+				Attributes: attributes,
 			})
 		}
 

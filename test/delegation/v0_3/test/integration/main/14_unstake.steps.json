@@ -15,7 +15,7 @@
             "txId": "14-check-nodes-before",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getAllNodeStates",
                 "arguments": [],
@@ -43,7 +43,7 @@
             "txId": "14-check-sale-before",
             "tx": {
                 "from": "''someone_______________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getStakeForSale",
                 "arguments": [
@@ -67,7 +67,7 @@
             "txId": "14-user-unstake",
             "tx": {
                 "from": "''delegator_1___________________s1",
-                "to": "''delegation_contract___________s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": [],
@@ -79,7 +79,7 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "''delegation_contract___________s1",
+                        "address": "sc:delegation",
                         "identifier": "0x0000000000000000000000000000000000000000000000000000000000000005",
                         "topics": [],
                         "data": "0x"

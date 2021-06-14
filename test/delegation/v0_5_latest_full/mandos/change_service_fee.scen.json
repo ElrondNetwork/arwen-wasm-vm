@@ -15,7 +15,7 @@
             "txId": "-set-service-fee-bootstrap?-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "isBootstrapMode",
                 "arguments": [],
@@ -35,7 +35,7 @@
             "txId": "-set-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setServiceFee",
                 "arguments": [
@@ -57,7 +57,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],
@@ -89,7 +89,7 @@
             "txId": "-set-service-fee-bootstrap?-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "isBootstrapMode",
                 "arguments": [],
@@ -109,7 +109,7 @@
             "txId": "-set-service-fee-out-of-gas-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setServiceFee",
                 "arguments": [
@@ -131,7 +131,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],
@@ -151,7 +151,7 @@
             "txId": "continue",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "continueGlobalOperation",
                 "arguments": [],
@@ -171,7 +171,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],
@@ -191,7 +191,7 @@
             "txId": "-set-service-fee-same-value-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setServiceFee",
                 "arguments": [
@@ -213,7 +213,7 @@
             "txId": "-get-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getServiceFee",
                 "arguments": [],

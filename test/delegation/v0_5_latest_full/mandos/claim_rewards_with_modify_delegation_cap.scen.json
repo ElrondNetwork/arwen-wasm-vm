@@ -28,7 +28,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["1,000,000,000"],
@@ -47,7 +47,7 @@
             "step": "validatorReward",
             "txId": "validatorReward-1",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "100,000,000"
             }
         },
@@ -56,7 +56,7 @@
             "txId": "-set-service-fee-",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "modifyTotalDelegationCap",
                 "arguments": [
@@ -77,7 +77,7 @@
             "step": "validatorReward",
             "txId": "validatorReward-2",
             "tx": {
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "100,000,000"
             }
         },
@@ -86,7 +86,7 @@
             "txId": "get-total-cumulated-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTotalCumulatedRewards",
                 "arguments": [],
@@ -108,7 +108,7 @@
             "txId": "claimable-0",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -132,7 +132,7 @@
             "txId": "claimable-1",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -156,7 +156,7 @@
             "txId": "claimable-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getClaimableRewards",
                 "arguments": [
@@ -180,7 +180,7 @@
             "txId": "delegator 1 claim 1",
             "tx": {
                 "from": "address:delegator1",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "claimRewards",
                 "arguments": [],
@@ -200,7 +200,7 @@
             "txId": "delegator 2 claim 1",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "claimRewards",
                 "arguments": [],
@@ -220,7 +220,7 @@
             "txId": "delegator 0 claim 1",
             "tx": {
                 "from": "address:node_address",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "claimRewards",
                 "arguments": [],
@@ -239,7 +239,7 @@
             "step": "checkState",
             "comment": "check that rewards were received",
             "accounts": {
-                "address:delegation_contract": {
+                "sc:delegation": {
                     "comment": "inactive stake + unclaimed rewards",
                     "nonce": "*",
                     "balance": "300,001,000,000,000",
@@ -273,7 +273,7 @@
             "txId": "check-stake-by-type-2",
             "tx": {
                 "from": "address:someone",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getUserStakeByType",
                 "arguments": [

@@ -2,14 +2,15 @@ package arwenmandos
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"math/big"
+	"strings"
 
 	er "github.com/ElrondNetwork/arwen-wasm-vm/mandos-go/expression/reconstructor"
 	mj "github.com/ElrondNetwork/arwen-wasm-vm/mandos-go/json/model"
 	oj "github.com/ElrondNetwork/arwen-wasm-vm/mandos-go/orderedjson"
 	worldmock "github.com/ElrondNetwork/arwen-wasm-vm/mock/world"
+	"github.com/ElrondNetwork/elrond-go/core"
 	"github.com/ElrondNetwork/elrond-go/data/esdt"
 )
 
@@ -23,7 +24,7 @@ func (ae *ArwenTestExecutor) ExecuteCheckStateStep(step *mj.CheckStateStep) erro
 }
 
 func (ae *ArwenTestExecutor) checkAccounts(checkAccounts *mj.CheckAccounts) error {
-	if !checkAccounts.OtherAccountsAllowed {
+	if !checkAccounts.MoreAccountsAllowed {
 		for worldAcctAddr := range ae.World.AcctMap {
 			postAcctMatch := mj.FindCheckAccount(checkAccounts.Accounts, []byte(worldAcctAddr))
 			if postAcctMatch == nil {
@@ -39,9 +40,7 @@ func (ae *ArwenTestExecutor) checkAccounts(checkAccounts *mj.CheckAccounts) erro
 		matchingAcct, isMatch := ae.World.AcctMap[string(expectedAcct.Address.Value)]
 		if !isMatch {
 			return fmt.Errorf("account %s expected but not found after running test",
-				ae.exprReconstructor.Reconstruct(
-					expectedAcct.Address.Value,
-					er.AddressHint))
+				expectedAcct.Address.Original)
 		}
 
 		if !bytes.Equal(matchingAcct.Address, expectedAcct.Address.Value) {
@@ -52,22 +51,22 @@ func (ae *ArwenTestExecutor) checkAccounts(checkAccounts *mj.CheckAccounts) erro
 		}
 
 		if !expectedAcct.Nonce.Check(matchingAcct.Nonce) {
-			return fmt.Errorf("bad account nonce. Account: %s. Want: \"%s\". Have: %d",
-				hex.EncodeToString(matchingAcct.Address),
+			return fmt.Errorf("bad account nonce. Account: %s. Want: \"%s\". Have: \"%d\"",
+				expectedAcct.Address.Original,
 				expectedAcct.Nonce.Original,
 				matchingAcct.Nonce)
 		}
 
 		if !expectedAcct.Balance.Check(matchingAcct.Balance) {
 			return fmt.Errorf("bad account balance. Account: %s. Want: \"%s\". Have: \"%s\"",
-				hex.EncodeToString(matchingAcct.Address),
+				expectedAcct.Address.Original,
 				expectedAcct.Balance.Original,
 				ae.exprReconstructor.ReconstructFromBigInt(matchingAcct.Balance))
 		}
 
 		if !expectedAcct.Username.Check(matchingAcct.Username) {
 			return fmt.Errorf("bad account username. Account: %s. Want: %s. Have: \"%s\"",
-				hex.EncodeToString(matchingAcct.Address),
+				expectedAcct.Address.Original,
 				oj.JSONString(expectedAcct.Username.Original),
 				ae.exprReconstructor.Reconstruct(
 					matchingAcct.Username,
@@ -75,17 +74,19 @@ func (ae *ArwenTestExecutor) checkAccounts(checkAccounts *mj.CheckAccounts) erro
 		}
 
 		if !expectedAcct.Code.Check(matchingAcct.Code) {
-			return fmt.Errorf("bad account code. Account: %s. Want: [%s]. Have: [%s]",
-				hex.EncodeToString(matchingAcct.Address),
-				expectedAcct.Code.Original,
-				string(matchingAcct.Code))
+			return fmt.Errorf("bad account code. Account: %s. Want: %s. Have: \"%s\"",
+				expectedAcct.Address.Original,
+				oj.JSONString(expectedAcct.Code.Original),
+				ae.exprReconstructor.Reconstruct(
+					matchingAcct.Code,
+					er.CodeHint))
 		}
 
 		// currently ignoring asyncCallData that is unspecified in the json
 		if !expectedAcct.AsyncCallData.IsUnspecified() &&
 			!expectedAcct.AsyncCallData.Check([]byte(matchingAcct.AsyncCallData)) {
 			return fmt.Errorf("bad async call data. Account: %s. Want: [%s]. Have: [%s]",
-				hex.EncodeToString(matchingAcct.Address),
+				expectedAcct.Address.Original,
 				expectedAcct.AsyncCallData.Original,
 				matchingAcct.AsyncCallData)
 		}
@@ -109,9 +110,9 @@ func (ae *ArwenTestExecutor) checkAccountStorage(expectedAcct *mj.CheckAccount, 
 		return nil
 	}
 
-	expectedStorage := make(map[string][]byte)
+	expectedStorage := make(map[string]mj.JSONCheckBytes)
 	for _, stkvp := range expectedAcct.CheckStorage {
-		expectedStorage[string(stkvp.Key.Value)] = stkvp.Value.Value
+		expectedStorage[string(stkvp.Key.Value)] = stkvp.CheckValue
 	}
 
 	allKeys := make(map[string]bool)
@@ -123,13 +124,29 @@ func (ae *ArwenTestExecutor) checkAccountStorage(expectedAcct *mj.CheckAccount, 
 	}
 	storageError := ""
 	for k := range allKeys {
-		want := expectedStorage[k]
+		// ignore all reserved "ELROND..." keys
+		if strings.HasPrefix(k, core.ElrondProtectedKeyPrefix) {
+			continue
+		}
+
+		want, specified := expectedStorage[k]
+		if !specified {
+			if expectedAcct.MoreStorageAllowed {
+				// if `"+": ""` was written in the test, any unspecified entries are allowed,
+				// which is equivalent to treating them all as "*".
+				want = mj.JSONCheckBytesStar()
+			} else {
+				// otherwise, by default, any unexpected storage key leads to a test failure
+				want = mj.JSONCheckBytesUnspecified()
+			}
+		}
 		have := matchingAcct.StorageValue(k)
-		if !bytes.Equal(want, have) && !worldmock.IsESDTKey([]byte(k)) {
+
+		if !want.Check(have) {
 			storageError += fmt.Sprintf(
-				"\n  for key %s: Want: %s. Have: %s",
+				"\n  for key %s: Want: %s. Have: \"%s\"",
 				ae.exprReconstructor.Reconstruct([]byte(k), er.NoHint),
-				ae.exprReconstructor.Reconstruct(want, er.NoHint),
+				oj.JSONString(want.Original),
 				ae.exprReconstructor.Reconstruct(have, er.NoHint))
 		}
 	}
@@ -181,13 +198,13 @@ func (ae *ArwenTestExecutor) checkAccountESDT(expectedAcct *mj.CheckAccount, mat
 				Roles:           nil,
 			}
 		} else {
-			errors = append(errors, checkTokenState(accountAddress, tokenName, expectedToken, accountToken)...)
+			errors = append(errors, ae.checkTokenState(accountAddress, tokenName, expectedToken, accountToken)...)
 		}
 	}
 
 	errorString := makeErrorString(errors)
 	if len(errorString) > 0 {
-		return fmt.Errorf("mismatch for account %s: %s", accountAddress, errorString)
+		return fmt.Errorf("mismatch for account \"%s\":%s", accountAddress, errorString)
 	}
 
 	return nil
@@ -203,7 +220,7 @@ func getExpectedTokens(expectedAcct *mj.CheckAccount) map[string]*mj.CheckESDTDa
 	return expectedTokens
 }
 
-func checkTokenState(
+func (ae *ArwenTestExecutor) checkTokenState(
 	accountAddress string,
 	tokenName string,
 	expectedToken *mj.CheckESDTData,
@@ -211,7 +228,7 @@ func checkTokenState(
 
 	var errors []error
 
-	errors = append(errors, checkTokenInstances(accountAddress, tokenName, expectedToken, accountToken)...)
+	errors = append(errors, ae.checkTokenInstances(accountAddress, tokenName, expectedToken, accountToken)...)
 
 	if !expectedToken.LastNonce.Check(accountToken.LastNonce) {
 		errors = append(errors, fmt.Errorf("bad account ESDT last nonce. Account: %s. Token: %s. Want: \"%s\". Have: %d",
@@ -226,7 +243,7 @@ func checkTokenState(
 	return errors
 }
 
-func checkTokenInstances(
+func (ae *ArwenTestExecutor) checkTokenInstances(
 	accountAddress string,
 	tokenName string,
 	expectedToken *mj.CheckESDTData,
@@ -267,15 +284,77 @@ func checkTokenInstances(
 			}
 		} else {
 			if !expectedInstance.Balance.Check(accountInstance.Value) {
-				errors = append(errors, fmt.Errorf("bad ESDT balance. Account: %s. Token: %s. Nonce: %d. Want: %s. Have: %d",
-					accountAddress,
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: Bad balance. Want: \"%s\". Have: \"%d\"",
 					tokenName,
 					nonce,
 					expectedInstance.Balance.Original,
 					accountInstance.Value))
 			}
-
-			// TODO: check metadata/properties
+			if !expectedInstance.Creator.IsUnspecified() &&
+				!expectedInstance.Creator.Check(accountInstance.TokenMetaData.Creator) {
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: Bad creator. Want: %s. Have: \"%s\"",
+					tokenName,
+					nonce,
+					oj.JSONString(expectedInstance.Creator.Original),
+					ae.exprReconstructor.Reconstruct(
+						accountInstance.TokenMetaData.Creator,
+						er.AddressHint)))
+			}
+			if !expectedInstance.Royalties.IsUnspecified() &&
+				!expectedInstance.Royalties.Check(uint64(accountInstance.TokenMetaData.Royalties)) {
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: Bad royalties. Want: \"%s\". Have: \"%s\"",
+					tokenName,
+					nonce,
+					expectedInstance.Royalties.Original,
+					ae.exprReconstructor.ReconstructFromUint64(
+						uint64(accountInstance.TokenMetaData.Royalties))))
+			}
+			if !expectedInstance.Hash.IsUnspecified() &&
+				!expectedInstance.Hash.Check(accountInstance.TokenMetaData.Hash) {
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: Bad hash. Want: %s. Have: %s",
+					tokenName,
+					nonce,
+					oj.JSONString(expectedInstance.Hash.Original),
+					ae.exprReconstructor.Reconstruct(
+						accountInstance.TokenMetaData.Hash,
+						er.NoHint)))
+			}
+			if len(accountInstance.TokenMetaData.URIs) > 1 {
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: More than one URI currently not supported",
+					tokenName,
+					nonce))
+			}
+			var actualUri []byte
+			if len(accountInstance.TokenMetaData.URIs) == 1 {
+				actualUri = accountInstance.TokenMetaData.URIs[0]
+			}
+			if !expectedInstance.Uri.IsUnspecified() &&
+				!expectedInstance.Uri.Check(actualUri) {
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: Bad URI. Want: %s. Have: \"%s\"",
+					tokenName,
+					nonce,
+					oj.JSONString(expectedInstance.Uri.Original),
+					ae.exprReconstructor.Reconstruct(
+						actualUri,
+						er.StrHint)))
+			}
+			if !expectedInstance.Attributes.IsUnspecified() &&
+				!expectedInstance.Attributes.Check(accountInstance.TokenMetaData.Attributes) {
+				errors = append(errors, fmt.Errorf(
+					"for token: %s, nonce: %d: Bad attributes. Want: %s. Have: \"%s\"",
+					tokenName,
+					nonce,
+					oj.JSONString(expectedInstance.Attributes.Original),
+					ae.exprReconstructor.Reconstruct(
+						accountInstance.TokenMetaData.Attributes,
+						er.StrHint)))
+			}
 		}
 	}
 
@@ -322,11 +401,8 @@ func checkTokenRoles(
 
 func makeErrorString(errors []error) string {
 	errorString := ""
-	for i, err := range errors {
-		errorString += err.Error()
-		if i < len(errors)-1 {
-			errorString += "\n"
-		}
+	for _, err := range errors {
+		errorString += "\n  " + err.Error()
 	}
 	return errorString
 }

@@ -16,7 +16,7 @@
                 {
                     "creatorAddress": "''node_address__________________s1",
                     "creatorNonce": "0",
-                    "newAddress": "''new_delegation_contract_______s1"
+                    "newAddress": "sc:delegation"
                 }
             ]
         },
@@ -29,7 +29,7 @@
                 "contractCode": "file:../delegation.wasm",
                 "arguments": [
                     "3455",
-                    "''auction_contract______________s1",
+                    "sc:auction",
                     "680400"
                 ],
                 "gasLimit": "0x100000",
@@ -52,14 +52,14 @@
                     "storage": {},
                     "code": ""
                 },
-                "''new_delegation_contract_______s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "''owner": "''node_address__________________s1",
                         "''node_share": "3455",
                         "''node_rewards_addr": "''node_address__________________s1",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
                         "''time_before_force_unstake": "680400",
 
                         "''num_users": "1",
@@ -74,7 +74,7 @@
             "txId": "2-nr-nodes",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''new_delegation_contract_______s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setNumNodes",
                 "arguments": [
@@ -96,7 +96,7 @@
             "txId": "3-stake-per-node",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''new_delegation_contract_______s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "setStakePerNode",
                 "arguments": [
@@ -122,14 +122,14 @@
                     "storage": {},
                     "code": ""
                 },
-                "''new_delegation_contract_______s1": {
+                "sc:delegation": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
                         "''owner": "''node_address__________________s1",
                         "''node_share": "3455",
                         "''node_rewards_addr": "''node_address__________________s1",
-                        "''auction_addr": "''auction_contract______________s1",
+                        "''auction_addr": "sc:auction",
 
                         "''num_nodes": "3",
                         "''stake_per_node": "123,000,321",
@@ -147,7 +147,7 @@
             "txId": "4 - check time before force unstake",
             "tx": {
                 "from": "''node_address__________________s1",
-                "to": "''new_delegation_contract_______s1",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "getTimeBeforeForceUnstake",
                 "arguments": [],

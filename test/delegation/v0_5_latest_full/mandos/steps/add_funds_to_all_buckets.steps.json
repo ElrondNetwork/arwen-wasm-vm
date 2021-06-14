@@ -6,7 +6,7 @@
             "txId": "user-unstake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "0",
                 "function": "unStake",
                 "arguments": ["6,000,000,000"],
@@ -35,7 +35,7 @@
             "txId": "delegator 2 stake",
             "tx": {
                 "from": "address:delegator2",
-                "to": "address:delegation_contract",
+                "to": "sc:delegation",
                 "value": "3,000,000,000",
                 "function": "stake",
                 "arguments": [],
