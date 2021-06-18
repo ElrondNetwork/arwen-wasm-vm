@@ -213,7 +213,7 @@ func (context *meteringContext) checkGas(vmOutput *vmcommon.VMOutput) error {
 	gasProvided := context.GetGasProvided()
 
 	if totalGas != gasProvided {
-		logOutput.Error("gas usage mismatch", "total gas", totalGas, "gas provided", gasProvided)
+		logMetering.Error("gas usage mismatch", "total gas", totalGas, "gas provided", gasProvided)
 		return arwen.ErrInputAndOutputGasDoesNotMatch
 	}
 

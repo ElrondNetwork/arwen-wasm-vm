@@ -725,7 +725,7 @@ func (context *runtimeContext) GetFunctionToCall() (wasmer.ExportedFunctionCallb
 
 	if context.callFunction == arwen.CallbackFunctionName {
 		// TODO rewrite this condition, until the AsyncContext is merged
-		logRuntime.Error("get function to call", "error", arwen.ErrNilCallbackFunction)
+		logRuntime.Trace("get function to call", "error", arwen.ErrNilCallbackFunction)
 		return nil, arwen.ErrNilCallbackFunction
 	}
 
