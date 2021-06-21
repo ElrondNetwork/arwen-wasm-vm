@@ -100,7 +100,7 @@ func (b *MockWorld) UpdateAccountFromOutputAccount(modAcct *vmcommon.OutputAccou
 
 // CreateStateBackup -
 func (b *MockWorld) CreateStateBackup() {
-	b.AccountsAdapter.SnapshotState(nil, nil)
+	b.AccountsAdapter.SnapshotState(nil)
 }
 
 // CommitChanges -
