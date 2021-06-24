@@ -206,11 +206,6 @@ func (pfe *fuzzDelegationExecutor) removeNodes(numNodesToRemove int) error {
 	return nil
 }
 
-func (pfe *fuzzDelegationExecutor) nextTxIndex() int {
-	pfe.txIndex++
-	return pfe.txIndex
-}
-
 func blsKeysToBeRemoved(totalNumNodes, numKeysToBeRemoved int) string {
 	var blsKeys []string
 	for i := 0; i < numKeysToBeRemoved; i++ {

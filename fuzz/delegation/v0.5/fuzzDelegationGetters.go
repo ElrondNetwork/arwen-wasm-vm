@@ -5,6 +5,11 @@ import (
 	"math/big"
 )
 
+func (pfe *fuzzDelegationExecutor) nextTxIndex() int {
+	pfe.txIndex++
+	return pfe.txIndex
+}
+
 func (pfe *fuzzDelegationExecutor) interpretExpr(expression string) []byte {
 	bytes, err := pfe.mandosParser.ExprInterpreter.InterpretString(expression)
 	if err != nil {
