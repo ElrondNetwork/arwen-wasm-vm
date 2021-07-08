@@ -100,7 +100,6 @@ func (pfe *fuzzDexExecutor) removeLiquidity(r *rand.Rand, statistics *eventsStat
 		if big.NewInt(0).Cmp(before) != 0 {
 			statistics.removeLiquidityPriceChecks += 1
 
-			statistics.addLiquidityPriceChecks += 1
 			after := big.NewInt(0).SetBytes(rawOutput[0])
 			difference := big.NewInt(0).Abs(big.NewInt(0).Sub(before, after))
 

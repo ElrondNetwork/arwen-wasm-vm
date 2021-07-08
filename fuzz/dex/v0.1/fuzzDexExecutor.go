@@ -31,6 +31,9 @@ type fuzzDexExecutorInitArgs struct {
 	enterFarmProb           int
 	exitFarmProb            int
 	claimRewardsProb        int
+	compoundRewardsProb     int
+	compoundRewardsMaxValue int
+	tokenDepositMaxValue    int
 	increaseBlockNonceProb  int
 	removeLiquidityMaxValue int
 	addLiquidityMaxValue    int
@@ -59,7 +62,6 @@ type FarmerInfo struct {
 	user  string
 	value int64
 	farm  Farm
-	rps   string
 }
 
 type fuzzDexExecutor struct {
@@ -93,6 +95,7 @@ type fuzzDexExecutor struct {
 	enterFarmProb           int
 	exitFarmProb            int
 	claimRewardsProb        int
+	compoundRewardsProb     int
 	increaseBlockNonceProb  int
 	removeLiquidityMaxValue int
 	addLiquidityMaxValue    int
@@ -100,6 +103,8 @@ type fuzzDexExecutor struct {
 	enterFarmMaxValue       int
 	exitFarmMaxValue        int
 	claimRewardsMaxValue    int
+	compoundRewardsMaxValue int
+	tokenDepositMaxValue    int
 	blockNonceIncrease      int
 	tokensCheckFrequency    int
 	currentFarmTokenNonce   map[string]int
@@ -137,6 +142,9 @@ type eventsStatistics struct {
 	claimRewardsHits        int
 	claimRewardsMisses      int
 	claimRewardsWithRewards int
+
+	compoundRewardsHits   int
+	compoundRewardsMisses int
 }
 
 func newFuzzDexExecutor(fileResolver fr.FileResolver) (*fuzzDexExecutor, error) {

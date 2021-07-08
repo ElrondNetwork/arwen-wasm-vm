@@ -22,6 +22,7 @@ func (pfe *fuzzDexExecutor) init(args *fuzzDexExecutorInitArgs) error {
 	pfe.enterFarmProb = args.enterFarmProb
 	pfe.exitFarmProb = args.exitFarmProb
 	pfe.claimRewardsProb = args.claimRewardsProb
+	pfe.compoundRewardsProb = args.compoundRewardsProb
 	pfe.increaseBlockNonceProb = args.increaseBlockNonceProb
 	pfe.removeLiquidityMaxValue = args.removeLiquidityMaxValue
 	pfe.addLiquidityMaxValue = args.addLiquidityMaxValue
@@ -29,6 +30,8 @@ func (pfe *fuzzDexExecutor) init(args *fuzzDexExecutorInitArgs) error {
 	pfe.enterFarmMaxValue = args.enterFarmMaxValue
 	pfe.exitFarmMaxValue = args.exitFarmMaxValue
 	pfe.claimRewardsMaxValue = args.claimRewardsMaxValue
+	pfe.compoundRewardsMaxValue = args.compoundRewardsMaxValue
+	pfe.tokenDepositMaxValue = args.tokenDepositMaxValue
 	pfe.blockNonceIncrease = args.blockNonceIncrease
 	pfe.farmers = make(map[int]FarmerInfo)
 	pfe.currentFarmTokenNonce = make(map[string]int)
@@ -263,7 +266,12 @@ func (pfe *fuzzDexExecutor) setupFarm(farmAddress, farmTokenId, enterFarmTokenId
 						"str:create_farm_tokens_gas_limit": "5000000",
 						"str:produce_rewards_enabled": "1",
 						"str:per_block_reward_amount": "10000000000000000",
-						"str:penalty_percent": "0"
+						"str:penalty_percent": "0",
+						"str:nft_deposit_max_len": "10",
+						"str:nft_deposit_accepted_token_ids.info": "u32:1|u32:1|u32:1|u32:1",
+						"str:nft_deposit_accepted_token_ids.node_id|str:%s": "1",
+						"str:nft_deposit_accepted_token_ids.node_links": "0",
+						"str:nft_deposit_accepted_token_ids.value|u32:1": "str:%s"
 					},
 					"code": "file:elrond_dex_farm.wasm",
 					"owner": "%s"
@@ -279,6 +287,8 @@ func (pfe *fuzzDexExecutor) setupFarm(farmAddress, farmTokenId, enterFarmTokenId
 		rewardTokenId,
 		routerAddress,
 		owner,
+		farmTokenId,
+		farmTokenId,
 		owner,
 	))
 }

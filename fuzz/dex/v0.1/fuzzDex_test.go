@@ -80,12 +80,15 @@ func TestFuzzDex_v0_1(t *testing.T) {
 			enterFarmProb:           18,
 			exitFarmProb:            6,
 			claimRewardsProb:        20,
+			compoundRewardsProb:     10,
 			removeLiquidityMaxValue: 1000000000,
 			addLiquidityMaxValue:    1000000000,
 			swapMaxValue:            10000000,
 			enterFarmMaxValue:       100000000,
 			exitFarmMaxValue:        100000000,
-			claimRewardsMaxValue:    10000000,
+			claimRewardsMaxValue:    50000000,
+			compoundRewardsMaxValue: 50000000,
+			tokenDepositMaxValue:    50000000,
 			blockNonceIncrease:      1,
 		},
 	)
@@ -180,6 +183,13 @@ func generateRandomEvent(
 				assert.Nil(t, err)
 			},
 		},
+		roulette.Outcome{
+			Weight: pfe.compoundRewardsProb,
+			Event: func() {
+				err := pfe.compoundRewards(r, statistics)
+				assert.Nil(t, err)
+			},
+		},
 	)
 }
 
@@ -212,5 +222,8 @@ func printStatistics(statistics *eventsStatistics, pfe *fuzzDexExecutor) {
 	pfe.log("\tclaimRewardsHits %d", statistics.claimRewardsHits)
 	pfe.log("\tclaimRewardsMisses %d", statistics.claimRewardsMisses)
 	pfe.log("\tclaimRewardsWithRewards %d", statistics.claimRewardsWithRewards)
+	pfe.log("")
+	pfe.log("\tcompoundRewardsHits %d", statistics.compoundRewardsHits)
+	pfe.log("\tcompoundRewardsMisses %d", statistics.compoundRewardsMisses)
 	pfe.log("")
 }
