@@ -161,3 +161,6 @@ var ErrNoEllipticCurveUnderThisHandle = errors.New("no elliptic curve under the 
 
 // ErrPointNotOnCurve signals that the point to be used is not on curve
 var ErrPointNotOnCurve = errors.New("point is not on curve")
+
+// ErrNoManagedBufferUnderThisHandle signals that there is no buffer for the given handle
+var ErrNoManagedBufferUnderThisHandle = errors.New("no managed buffer under the given handle")

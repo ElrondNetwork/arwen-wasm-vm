@@ -33,8 +33,10 @@ type managedTypesContext struct {
 	host             arwen.VMHost
 	bigIntValues     bigIntMap
 	ecValues         ellipticCurveMap
-	ecStateStack     []ellipticCurveMap
+	manBufValues     managedBufferMap
 	bigIntStateStack []bigIntMap
+	ecStateStack     []ellipticCurveMap
+	manBufStack      []managedBufferMap
 }
 
 // NewBigIntContext creates a new bigIntContext
@@ -43,8 +45,10 @@ func NewManagedTypesContext(host arwen.VMHost) (*managedTypesContext, error) {
 		host:             host,
 		bigIntValues:     make(bigIntMap),
 		ecValues:         make(ellipticCurveMap),
-		ecStateStack:     make([]ellipticCurveMap, 0),
+		manBufValues:     make(managedBufferMap),
 		bigIntStateStack: make([]bigIntMap, 0),
+		ecStateStack:     make([]ellipticCurveMap, 0),
+		manBufStack:      make([]managedBufferMap, 0),
 	}
 
 	return context, nil
@@ -54,22 +58,26 @@ func NewManagedTypesContext(host arwen.VMHost) (*managedTypesContext, error) {
 func (context *managedTypesContext) InitState() {
 	context.bigIntValues = make(bigIntMap)
 	context.ecValues = make(ellipticCurveMap)
+	context.manBufValues = make(managedBufferMap)
 }
 
 // PushState appends the values map to the state stack
 func (context *managedTypesContext) PushState() {
-	newBigIntState, newEcState := context.clone()
+	newBigIntState, newEcState, newManBufState := context.clone()
 	context.bigIntStateStack = append(context.bigIntStateStack, newBigIntState)
 	context.ecStateStack = append(context.ecStateStack, newEcState)
+	context.manBufStack = append(context.manBufStack, newManBufState)
 }
 
 // PopSetActiveState removes the latest entry from the state stack and sets it as the current values map
 func (context *managedTypesContext) PopSetActiveState() {
 	bigIntStateStackLen := len(context.bigIntStateStack)
-	ecStateStackLen := len(context.ecStateStack)
-	if bigIntStateStackLen == 0 && ecStateStackLen == 0 {
+	if bigIntStateStackLen == 0 {
 		return
 	}
+	ecStateStackLen := len(context.ecStateStack)
+	manBufStackLen := len(context.manBufStack)
+
 	prevBigIntValues := context.bigIntStateStack[bigIntStateStackLen-1]
 	context.bigIntStateStack = context.bigIntStateStack[:bigIntStateStackLen-1]
 	context.bigIntValues = prevBigIntValues
@@ -77,36 +85,47 @@ func (context *managedTypesContext) PopSetActiveState() {
 	prevEcValues := context.ecStateStack[ecStateStackLen-1]
 	context.ecStateStack = context.ecStateStack[:ecStateStackLen-1]
 	context.ecValues = prevEcValues
+
+	prevManBufValues := context.manBufStack[manBufStackLen-1]
+	context.manBufStack = context.manBufStack[:manBufStackLen-1]
+	context.manBufValues = prevManBufValues
 }
 
 // PopDiscard removes the latest entry from the state stack
 func (context *managedTypesContext) PopDiscard() {
 	bigIntStateStackLen := len(context.bigIntStateStack)
-	ecStateStackLen := len(context.ecStateStack)
-	if bigIntStateStackLen == 0 && ecStateStackLen == 0 {
+	if bigIntStateStackLen == 0 {
 		return
 	}
+	ecStateStackLen := len(context.ecStateStack)
+	manBufStateStackLen := len(context.manBufStack)
 
 	context.ecStateStack = context.ecStateStack[:ecStateStackLen-1]
 	context.bigIntStateStack = context.bigIntStateStack[:bigIntStateStackLen-1]
+	context.manBufStack = context.manBufStack[:manBufStateStackLen-1]
 }
 
 // ClearStateStack initializes the state stack
 func (context *managedTypesContext) ClearStateStack() {
 	context.bigIntStateStack = make([]bigIntMap, 0)
 	context.ecStateStack = make([]ellipticCurveMap, 0)
+	context.manBufStack = make([]managedBufferMap, 0)
 }
 
-func (context *managedTypesContext) clone() (bigIntMap, ellipticCurveMap) {
+func (context *managedTypesContext) clone() (bigIntMap, ellipticCurveMap, managedBufferMap) {
 	newBigIntState := make(bigIntMap, len(context.bigIntValues))
 	newEcState := make(ellipticCurveMap, len(context.ecValues))
+	newManBufState := make(managedBufferMap, len(context.manBufValues))
 	for bigIntHandle, bigInt := range context.bigIntValues {
 		newBigIntState[bigIntHandle] = big.NewInt(0).Set(bigInt)
 	}
 	for ecHandle, ec := range context.ecValues {
 		newEcState[ecHandle] = ec
 	}
-	return newBigIntState, newEcState
+	for manBufHandle, manBuf := range context.manBufValues {
+		newManBufState[manBufHandle] = manBuf
+	}
+	return newBigIntState, newEcState, newManBufState
 }
 
 // IsInterfaceNil returns true if there is no value under the interface
@@ -146,7 +165,7 @@ func (context *managedTypesContext) ConsumeGasForThisBigIntNumberOfBytes(byteLen
 
 // BIGINT
 
-// GetOneOrCreate returns the value at the given handle. If there is no value under that value, it will set a new on with value 0
+// GetOneOrCreate returns the value at the given handle. If there is no value under that value, it will set a new one with value 0
 func (context *managedTypesContext) GetBigIntOrCreate(handle int32) *big.Int {
 	value, ok := context.bigIntValues[handle]
 	if !ok {
@@ -288,4 +307,109 @@ func (context *managedTypesContext) GetPrivateKeyByteLengthEC(ecHandle int32) in
 		return -1
 	}
 	return int32((curve.N.BitLen() + 7) / 8)
+}
+
+// MANAGED BUFFERS
+
+// NewManagedBuffer creates a new empty buffer in the managed buffers map and returns the handle
+func (context *managedTypesContext) NewManagedBuffer() int32 {
+	newHandle := int32(len(context.manBufValues))
+	for {
+		if _, ok := context.manBufValues[newHandle]; !ok {
+			break
+		}
+		newHandle++
+	}
+	newManBuf := make([]byte, 0)
+	context.manBufValues[newHandle] = newManBuf
+	return newHandle
+}
+
+// NewManagedBufferFromBytes creates a new buffer in the managed buffers map, sets the bytes provided, and returns the handle
+func (context *managedTypesContext) NewManagedBufferFromBytes(bytes []byte) int32 {
+	manBufHandle := context.NewManagedBuffer()
+	context.SetBytesForThisManagedBuffer(manBufHandle, bytes)
+	return manBufHandle
+}
+
+// SetBytesForThisManagedBuffer sets the bytes given as value for the managed buffer. Returns 0 if success, 1 otherwise
+func (context *managedTypesContext) SetBytesForThisManagedBuffer(manBufHandle int32, bytes []byte) int32 {
+	_, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return 1
+	}
+	context.manBufValues[manBufHandle] = bytes
+	return 0
+}
+
+// GetBytesForThisManagedBuffer returns the bytes for the managed buffer. Returns nil as value and error if buffer is non-existent
+func (context *managedTypesContext) GetBytesForThisManagedBuffer(manBufHandle int32) ([]byte, error) {
+	manBuf, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return nil, arwen.ErrNoManagedBufferUnderThisHandle
+	}
+	return manBuf, nil
+}
+
+// AppendBytesToThisManagedBuffer appends the given bytes to the buffer at the end
+func (context *managedTypesContext) AppendBytesToThisManagedBuffer(manBufHandle int32, bytes []byte) int32 {
+	_, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return 1
+	}
+	context.manBufValues[manBufHandle] = append(context.manBufValues[manBufHandle], bytes...)
+	return 0
+}
+
+// GetLengthForThisManagedBuffer returns the length of the managed buffer
+func (context *managedTypesContext) GetLengthForThisManagedBuffer(manBufHandle int32) int32 {
+	manBuf, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return -1
+	}
+	return int32(len(manBuf))
+}
+
+// GetSliceFromManagedBuffer returns a slice of given length beginning at given start position from the managed buffer
+func (context *managedTypesContext) GetSliceFromManagedBuffer(manBufHandle int32, startPosition int32, lengthOfSlice int32) ([]byte, error) {
+	manBuf, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return nil, arwen.ErrNoManagedBufferUnderThisHandle
+	}
+	if int(lengthOfSlice) > len(manBuf)-int(startPosition) || lengthOfSlice < 0 || startPosition < 0 {
+		return nil, arwen.ErrBadBounds
+	}
+	return manBuf[startPosition:(startPosition + lengthOfSlice)], nil
+}
+
+// DeleteSliceFromManagedBuffer deletes a slice from the managed buffer. Returns (new buffer, nil) if success, (nil, error) otherwise
+func (context *managedTypesContext) DeleteSliceFromManagedBuffer(manBufHandle int32, startPosition int32, lengthOfSlice int32) ([]byte, error) {
+	manBuf, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return nil, arwen.ErrNoManagedBufferUnderThisHandle
+	}
+	if lengthOfSlice < 0 || startPosition < 0 {
+		return nil, arwen.ErrBadBounds
+	}
+	if int(lengthOfSlice) > len(manBuf)-int(startPosition) {
+		manBuf = manBuf[:startPosition]
+	} else {
+		manBuf = append(manBuf[:startPosition], manBuf[startPosition+lengthOfSlice:]...)
+	}
+	context.manBufValues[manBufHandle] = manBuf
+	return context.manBufValues[manBufHandle], nil
+}
+
+// InsertSliceInManagedBuffer inserts a slice in the managed buffer at the given startPosition. Returns (new buffer, nil) if success, (nil, error) otherwise
+func (context *managedTypesContext) InsertSliceInManagedBuffer(manBufHandle int32, startPosition int32, slice []byte) ([]byte, error) {
+	manBuf, ok := context.manBufValues[manBufHandle]
+	if !ok {
+		return nil, arwen.ErrNoManagedBufferUnderThisHandle
+	}
+	if startPosition < 0 || startPosition > int32(len(manBuf))-1 {
+		return nil, arwen.ErrBadBounds
+	}
+	manBuf = append(manBuf[:startPosition], append(slice, manBuf[startPosition:]...)...)
+	context.manBufValues[manBufHandle] = manBuf
+	return context.manBufValues[manBufHandle], nil
 }
