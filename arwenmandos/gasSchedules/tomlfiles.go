@@ -1,7 +1,7 @@
-package gasschedules 
+package gasschedules
 
 const (
-gasScheduleV1 = `[BuiltInCost]
+	gasScheduleV1 = `[BuiltInCost]
     ChangeOwnerAddress    = 5000000
     ClaimDeveloperRewards = 5000000
     SaveUserName          = 5000000
@@ -116,6 +116,7 @@ gasScheduleV1 = `[BuiltInCost]
     GetBlockTimeStamp   = 1000
 
 [BigIntAPICost]
+	EllipticCurveNew		 = 500
     BigIntNew                = 100
     BigIntByteLength         = 100
     BigIntUnsignedByteLength = 100
@@ -132,6 +133,9 @@ gasScheduleV1 = `[BuiltInCost]
     BigIntAdd                = 100
     BigIntSub                = 100
     BigIntMul                = 600
+	BigIntSqrt               = 600
+    BigIntPow                = 600
+    BigIntLog                = 600
     BigIntTDiv               = 100
     BigIntTMod               = 100
     BigIntEDiv               = 100
@@ -157,12 +161,21 @@ gasScheduleV1 = `[BuiltInCost]
     BigIntGetExternalBalance    = 500
 
 [CryptoAPICost]
-    SHA256          = 600
-    Keccak256       = 600
-    Ripemd160       = 600
-    VerifyBLS       = 1000
-    VerifyEd25519   = 1000
-    VerifySecp256k1 = 1000
+    SHA256          	   = 600
+    Keccak256       	   = 600
+    Ripemd160       	   = 600
+    VerifyBLS       	   = 1000
+    VerifyEd25519   	   = 1000
+    VerifySecp256k1 	   = 1000
+	AddECC                 = 600
+    DoubleECC              = 600
+    IsOnCurveECC           = 600
+    ScalarMultECC          = 600
+    MarshalECC             = 600
+    MarshalCompressedECC   = 600
+    UnmarshalECC           = 600
+    UnmarshalCompressedECC = 600
+    GenerateKeyECC         = 600
 
 [WASMOpcodeCost]
     Unreachable = 1
@@ -615,7 +628,7 @@ gasScheduleV1 = `[BuiltInCost]
     LocalAllocate = 2
     LocalsUnmetered = 100
 `
-gasScheduleV2 = `[BuiltInCost]
+	gasScheduleV2 = `[BuiltInCost]
     ChangeOwnerAddress    = 5000000
     ClaimDeveloperRewards = 5000000
     SaveUserName          = 1000000
@@ -744,6 +757,9 @@ gasScheduleV2 = `[BuiltInCost]
     BigIntAdd                = 2000
     BigIntSub                = 2000
     BigIntMul                = 6000
+	BigIntSqrt               = 6000
+    BigIntPow                = 6000
+    BigIntLog                = 6000
     BigIntTDiv               = 6000
     BigIntTMod               = 6000
     BigIntEDiv               = 6000
@@ -769,12 +785,22 @@ gasScheduleV2 = `[BuiltInCost]
     BigIntGetExternalBalance    = 10000
 
 [CryptoAPICost]
-    SHA256          = 1000000
-    Keccak256       = 1000000
-    Ripemd160       = 1000000
-    VerifyBLS       = 5000000
-    VerifyEd25519   = 2000000
-    VerifySecp256k1 = 2000000
+    SHA256          	   = 1000000
+    Keccak256       	   = 1000000
+    Ripemd160       	   = 1000000
+    VerifyBLS       	   = 5000000
+    VerifyEd25519   	   = 2000000
+    VerifySecp256k1 	   = 2000000
+	EllipticCurveNew		 = 10000
+	AddECC                 = 1000000
+    DoubleECC              = 1000000
+    IsOnCurveECC           = 1000000
+    ScalarMultECC          = 1000000
+    MarshalECC             = 1000000
+    MarshalCompressedECC   = 1000000
+    UnmarshalECC           = 1000000
+    UnmarshalCompressedECC = 1000000
+    GenerateKeyECC         = 1000000
 
 [WASMOpcodeCost]
     Unreachable = 1
@@ -1227,7 +1253,7 @@ gasScheduleV2 = `[BuiltInCost]
     LocalAllocate = 2
     LocalsUnmetered = 100
 `
-gasScheduleV3 = `[BuiltInCost]
+	gasScheduleV3 = `[BuiltInCost]
     ChangeOwnerAddress    = 5000000
     ClaimDeveloperRewards = 5000000
     SaveUserName          = 1000000
@@ -1358,6 +1384,9 @@ gasScheduleV3 = `[BuiltInCost]
     BigIntAdd                = 2000
     BigIntSub                = 2000
     BigIntMul                = 6000
+	BigIntSqrt               = 6000
+    BigIntPow                = 6000
+    BigIntLog                = 6000
     BigIntTDiv               = 6000
     BigIntTMod               = 6000
     BigIntEDiv               = 6000
@@ -1383,12 +1412,22 @@ gasScheduleV3 = `[BuiltInCost]
     BigIntGetExternalBalance    = 10000
 
 [CryptoAPICost]
-    SHA256          = 1000000
-    Keccak256       = 1000000
-    Ripemd160       = 1000000
-    VerifyBLS       = 5000000
-    VerifyEd25519   = 2000000
-    VerifySecp256k1 = 2000000
+	EllipticCurveNew	   = 10000
+    SHA256          	   = 1000000
+    Keccak256       	   = 1000000
+    Ripemd160       	   = 1000000
+    VerifyBLS       	   = 5000000
+    VerifyEd25519   	   = 2000000
+    VerifySecp256k1 	   = 2000000
+	AddECC                 = 1000000
+    DoubleECC              = 1000000
+    IsOnCurveECC           = 1000000
+    ScalarMultECC          = 1000000
+    MarshalECC             = 1000000
+    MarshalCompressedECC   = 1000000
+    UnmarshalECC           = 1000000
+    UnmarshalCompressedECC = 1000000
+    GenerateKeyECC         = 1000000
 
 [WASMOpcodeCost]
     Unreachable = 1

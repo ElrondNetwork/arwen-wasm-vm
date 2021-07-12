@@ -23,29 +23,28 @@ void parentCallsChild() {
 
 	byte iteration = (byte) int64getArgument(0);
 
+    bigIntGetOrCreateInt64(bigIntCounterID);
 	storeIterationNumber(iteration, 'P');
 	finishIterationNumber(iteration, 'P');
-
-  incrementIterCounter(smallCounterKey);
+    incrementIterCounter(smallCounterKey);
 	incrementBigIntCounter(bigIntCounterID);
 
-  // Run next iteration.
+    // Run next iteration.
 	byte functionName[] = "childCallsParent";
 	if (iteration > 0) {
 		arguments[0] = iteration - 1;
-    int result = executeOnSameContext(
-        maxGasForCalls,
-        childAddress,
-        executeValue,
-        functionName,
-        16,
-        1,
-        (byte*)argumentsLengths,
-        arguments
-    );
-
-    finishResult(result);
-  } else {
-    bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
-  }
+        int result = executeOnSameContext(
+            maxGasForCalls,
+            childAddress,
+            executeValue,
+            functionName,
+            16,
+            1,
+            (byte*)argumentsLengths,
+            arguments
+        );
+        finishResult(result);
+    } else {
+        bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
+    }
 }

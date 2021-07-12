@@ -55,9 +55,9 @@ void childFunction_BigInts() {
 	bigInt intB = int64getArgument(1);
 	bigInt intC = int64getArgument(2);
 
-	long long a = bigIntGetInt64(intA);
-	long long b = bigIntGetInt64(intB);
-	long long c = bigIntGetInt64(intC);
+	long long a = bigIntGetOrCreateInt64(intA);
+	long long b = bigIntGetOrCreateInt64(intB);
+	long long c = bigIntGetOrCreateInt64(intC);
 
 	// The parent sent bigInt ID 0 as argument, but since the parent bigInt context is
 	// separate from the child, the ID 0 was already taken inside didCallerPay(),

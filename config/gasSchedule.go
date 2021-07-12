@@ -257,6 +257,9 @@ func FillGasMap_BigIntAPICosts(value uint64) map[string]uint64 {
 	gasMap["BigIntAdd"] = value
 	gasMap["BigIntSub"] = value
 	gasMap["BigIntMul"] = value
+	gasMap["BigIntSqrt"] = value
+	gasMap["BigIntPow"] = value
+	gasMap["BigIntLog"] = value
 	gasMap["BigIntTDiv"] = value
 	gasMap["BigIntTMod"] = value
 	gasMap["BigIntEDiv"] = value
@@ -291,6 +294,16 @@ func FillGasMap_CryptoAPICosts(value uint64) map[string]uint64 {
 	gasMap["VerifyBLS"] = value
 	gasMap["VerifyEd25519"] = value
 	gasMap["VerifySecp256k1"] = value
+	gasMap["EllipticCurveNew"] = value
+	gasMap["AddECC"] = value
+	gasMap["DoubleECC"] = value
+	gasMap["IsOnCurveECC"] = value
+	gasMap["ScalarMultECC"] = value
+	gasMap["MarshalECC"] = value
+	gasMap["MarshalCompressedECC"] = value
+	gasMap["UnmarshalECC"] = value
+	gasMap["UnmarshalCompressedECC"] = value
+	gasMap["GenerateKeyECC"] = value
 
 	return gasMap
 }

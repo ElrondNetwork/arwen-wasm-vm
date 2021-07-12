@@ -1,12 +1,13 @@
 package arwen
 
 import (
+	"crypto/elliptic"
 	"math/big"
 
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/config"
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/crypto"
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/wasmer"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 	"github.com/ElrondNetwork/elrond-vm-common/data/esdt"
 )
 
@@ -31,7 +32,7 @@ type VMHost interface {
 	Crypto() crypto.VMCrypto
 	Blockchain() BlockchainContext
 	Runtime() RuntimeContext
-	BigInt() BigIntContext
+	ManagedTypes() ManagedTypesContext
 	Output() OutputContext
 	Metering() MeteringContext
 	Storage() StorageContext
@@ -52,7 +53,7 @@ type VMHost interface {
 	AreInSameShard(leftAddress []byte, rightAddress []byte) bool
 
 	GetGasScheduleMap() config.GasScheduleMap
-	GetContexts() (BigIntContext, BlockchainContext, MeteringContext, OutputContext, RuntimeContext, StorageContext)
+	GetContexts() (ManagedTypesContext, BlockchainContext, MeteringContext, OutputContext, RuntimeContext, StorageContext)
 	SetRuntimeContext(runtime RuntimeContext)
 
 	InitState()
@@ -158,14 +159,24 @@ type RuntimeContext interface {
 	ReplaceInstanceBuilder(builder InstanceBuilder)
 }
 
-// BigIntContext defines the functionality needed for interacting with the big int context
-type BigIntContext interface {
+// ManagedTypesContext defines the functionality needed for interacting with the big int context
+type ManagedTypesContext interface {
 	StateStack
 
-	Put(value int64) int32
-	GetOne(id int32) *big.Int
-	GetTwo(id1, id2 int32) (*big.Int, *big.Int)
-	GetThree(id1, id2, id3 int32) (*big.Int, *big.Int, *big.Int)
+	ConsumeGasForThisBigIntNumberOfBytes(byteLen *big.Int)
+	ConsumeGasForThisIntNumberOfBytes(byteLen int)
+	ConsumeGasForBigIntCopy(values ...*big.Int)
+	PutBigInt(value int64) int32
+	GetBigIntOrCreate(handle int32) *big.Int
+	GetBigInt(id int32) (*big.Int, error)
+	GetTwoBigInt(handle1 int32, handle2 int32) (*big.Int, *big.Int, error)
+	PutEllipticCurve(ec *elliptic.CurveParams) int32
+	GetEllipticCurve(handle int32) (*elliptic.CurveParams, error)
+	GetEllipticCurveSizeOfField(ecHandle int32) int32
+	Get100xCurveGasCostMultiplier(ecHandle int32) int32
+	GetScalarMult100xCurveGasCostMultiplier(ecHandle int32) int32
+	GetUCompressed100xCurveGasCostMultiplier(ecHandle int32) int32
+	GetPrivateKeyByteLengthEC(ecHandle int32) int32
 }
 
 // OutputContext defines the functionality needed for interacting with the output context

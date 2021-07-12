@@ -112,6 +112,9 @@ type BigIntAPICost struct {
 	BigIntAdd                  uint64
 	BigIntSub                  uint64
 	BigIntMul                  uint64
+	BigIntSqrt                 uint64
+	BigIntPow                  uint64
+	BigIntLog                  uint64
 	BigIntTDiv                 uint64
 	BigIntTMod                 uint64
 	BigIntEDiv                 uint64
@@ -137,12 +140,22 @@ type BigIntAPICost struct {
 }
 
 type CryptoAPICost struct {
-	SHA256          uint64
-	Keccak256       uint64
-	Ripemd160       uint64
-	VerifyBLS       uint64
-	VerifyEd25519   uint64
-	VerifySecp256k1 uint64
+	SHA256                 uint64
+	Keccak256              uint64
+	Ripemd160              uint64
+	VerifyBLS              uint64
+	VerifyEd25519          uint64
+	VerifySecp256k1        uint64
+	EllipticCurveNew       uint64
+	AddECC                 uint64
+	DoubleECC              uint64
+	IsOnCurveECC           uint64
+	ScalarMultECC          uint64
+	MarshalECC             uint64
+	MarshalCompressedECC   uint64
+	UnmarshalECC           uint64
+	UnmarshalCompressedECC uint64
+	GenerateKeyECC         uint64
 }
 
 type WASMOpcodeCost struct {

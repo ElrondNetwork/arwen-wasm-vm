@@ -563,26 +563,26 @@ func TestOutputContext_WriteLog(t *testing.T) {
 func TestOutputContext_PopSetActiveStateIfStackIsEmptyShouldNotPanic(t *testing.T) {
 	t.Parallel()
 
-	bigIntContext, _ := NewOutputContext(&contextmock.VMHostMock{})
-	bigIntContext.PopSetActiveState()
+	outputContext, _ := NewOutputContext(&contextmock.VMHostMock{})
+	outputContext.PopSetActiveState()
 
-	require.Equal(t, 0, len(bigIntContext.stateStack))
+	require.Equal(t, 0, len(outputContext.stateStack))
 }
 
 func TestOutputContext_PopMergeActiveStateIfStackIsEmptyShouldNotPanic(t *testing.T) {
 	t.Parallel()
 
-	bigIntContext, _ := NewOutputContext(&contextmock.VMHostMock{})
-	bigIntContext.PopMergeActiveState()
+	outputContext, _ := NewOutputContext(&contextmock.VMHostMock{})
+	outputContext.PopMergeActiveState()
 
-	require.Equal(t, 0, len(bigIntContext.stateStack))
+	require.Equal(t, 0, len(outputContext.stateStack))
 }
 
 func TestOutputContext_PopDiscardIfStackIsEmptyShouldNotPanic(t *testing.T) {
 	t.Parallel()
 
-	bigIntContext, _ := NewOutputContext(&contextmock.VMHostMock{})
-	bigIntContext.PopDiscard()
+	outputContext, _ := NewOutputContext(&contextmock.VMHostMock{})
+	outputContext.PopDiscard()
 
-	require.Equal(t, 0, len(bigIntContext.stateStack))
+	require.Equal(t, 0, len(outputContext.stateStack))
 }

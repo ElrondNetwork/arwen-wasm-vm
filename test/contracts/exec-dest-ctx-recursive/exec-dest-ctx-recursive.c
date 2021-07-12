@@ -23,30 +23,30 @@ void callRecursive() {
 
 	byte iteration = (byte) int64getArgument(0);
 
-  finishIterationNumber(iteration, 'R');
-  storeIterationNumber(iteration, 'R');
-  incrementIterCounter(smallCounterKey);
-  incrementBigIntCounter(bigIntCounterID);
+    bigIntGetOrCreateInt64(bigIntCounterID);
+    finishIterationNumber(iteration, 'R');
+    storeIterationNumber(iteration, 'R');
+    incrementIterCounter(smallCounterKey);
+    incrementBigIntCounter(bigIntCounterID);
 
-  // Run next iteration.
-  byte functionName[] = "callRecursive";
-  if (iteration > 0) {
-    arguments[0] = iteration - 1;
-    int result = executeOnDestContext(
-        maxGasForCalls,
-        selfAddress,
-        executeValue,
-        functionName,
-        13,
-        1,
-        (byte*)argumentsLengths,
-        arguments
-    );
-
-    finishResult(result);
-  } else {
-    bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
-  }
+    // Run next iteration.
+    byte functionName[] = "callRecursive";
+    if (iteration > 0) {
+        arguments[0] = iteration - 1;
+        int result = executeOnDestContext(
+            maxGasForCalls,
+            selfAddress,
+            executeValue,
+            functionName,
+            13,
+            1,
+            (byte*)argumentsLengths,
+            arguments
+        );
+        finishResult(result);
+    } else {
+        bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
+    }
 }
 
 void callRecursiveMutualMethods() {
@@ -57,84 +57,86 @@ void callRecursiveMutualMethods() {
 	}
 
 	byte iteration = (byte) int64getArgument(0);
-  if (iteration < 2) {
-		byte message[] = "need number of recursive calls >= 2";
-		signalError(message, 25);
-  }
+    if (iteration < 2) {
+        byte message[] = "need number of recursive calls >= 2";
+        signalError(message, 25);
+    }
 
-  byte startMsg[] = "start recursive mutual calls";
-  finish(startMsg, 28);
+    byte startMsg[] = "start recursive mutual calls";
+    finish(startMsg, 28);
 
-  byte functionNameB[] = "recursiveMethodA";
-  if (iteration > 0) {
-    arguments[0] = iteration;
-    int result = executeOnDestContext(
-        maxGasForCalls,
-        selfAddress,
-        executeValue,
-        functionNameB,
-        16,
-        1,
-        (byte*)argumentsLengths,
-        arguments
-    );
-    finishResult(result);
-  }
+    byte functionNameB[] = "recursiveMethodA";
+    if (iteration > 0) {
+        arguments[0] = iteration;
+        int result = executeOnDestContext(
+            maxGasForCalls,
+            selfAddress,
+            executeValue,
+            functionNameB,
+            16,
+            1,
+            (byte*)argumentsLengths,
+            arguments
+        );
+        finishResult(result);
+    }
 
-  byte endMsg[] = "end recursive mutual calls";
-  finish(endMsg, 26);
+    byte endMsg[] = "end recursive mutual calls";
+    finish(endMsg, 26);
 }
 
 void recursiveMethodA() {
 	byte iteration = (byte) int64getArgument(0);
 
-  finishIterationNumber(iteration, 'A');
-  storeIterationNumber(iteration, 'A');
-  incrementIterCounter(smallCounterKey);
-  incrementBigIntCounter(bigIntCounterID);
+    bigIntGetOrCreateInt64(bigIntCounterID);
+    finishIterationNumber(iteration, 'A');
+    storeIterationNumber(iteration, 'A');
+    incrementIterCounter(smallCounterKey);
+    incrementBigIntCounter(bigIntCounterID);
 
-  byte functionNameB[] = "recursiveMethodB";
-  if (iteration > 0) {
-    arguments[0] = iteration - 1;
-    int result = executeOnDestContext(
-        maxGasForCalls,
-        selfAddress,
-        executeValue,
-        functionNameB,
-        16,
-        1,
-        (byte*)argumentsLengths,
-        arguments
-    );
-    finishResult(result);
-  } else {
-    bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
-  }
+    byte functionNameB[] = "recursiveMethodB";
+    if (iteration > 0) {
+        arguments[0] = iteration - 1;
+        int result = executeOnDestContext(
+            maxGasForCalls,
+            selfAddress,
+            executeValue,
+            functionNameB,
+            16,
+            1,
+            (byte*)argumentsLengths,
+            arguments
+        );
+        finishResult(result);
+    } else {
+        bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
+    }
 }
 
 void recursiveMethodB() {
 	byte iteration = (byte) int64getArgument(0);
 
-  finishIterationNumber(iteration, 'B');
-  storeIterationNumber(iteration, 'B');
-  incrementIterCounter(smallCounterKey);
-  incrementBigIntCounter(bigIntCounterID);
+    bigIntGetOrCreateInt64(bigIntCounterID);
+    finishIterationNumber(iteration, 'B');
+    storeIterationNumber(iteration, 'B');
+    incrementIterCounter(smallCounterKey);
+    incrementBigIntCounter(bigIntCounterID);
 
-  byte functionNameB[] = "recursiveMethodA";
-  if (iteration > 0) {
-    arguments[0] = iteration - 1;
-    int result = executeOnDestContext(
-        maxGasForCalls,
-        selfAddress,
-        executeValue,
-        functionNameB,
-        16,
-        1,
-        (byte*)argumentsLengths,
-        arguments
-    );
-    finishResult(result);
-  } else {
-    bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
-  }
+    byte functionNameB[] = "recursiveMethodA";
+    if (iteration > 0) {
+        arguments[0] = iteration - 1;
+        int result = executeOnDestContext(
+            maxGasForCalls,
+            selfAddress,
+            executeValue,
+            functionNameB,
+            16,
+            1,
+            (byte*)argumentsLengths,
+            arguments
+        );
+        finishResult(result);
+    } else {
+        bigIntStorageStoreUnsigned(bigIntCounterKey, 32, bigIntCounterID);
+    }
 }

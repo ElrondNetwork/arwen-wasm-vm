@@ -7,3 +7,16 @@ void* memset(void *dest, int c, unsigned long n) {
 	}
 	return dest;
 }
+
+void *memcpy(void *dest, const void *src, unsigned long n)
+{
+    char *csrc = (char *)src;
+    char *cdest = (char *)dest;
+
+    for (unsigned long i = 0; i < n; i++)
+    {
+        cdest[i] = csrc[i];
+    }
+
+    return dest;
+}

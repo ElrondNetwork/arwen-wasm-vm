@@ -24,7 +24,7 @@ dependencies = [
 
 [[package]]
 name = "elrond-wasm"
-version = "0.7.2"
+version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16c29648c9c3fa8a649c77e2e3d21bb0916abb2c9a119c8545458365f344ab5c"
 dependencies = [

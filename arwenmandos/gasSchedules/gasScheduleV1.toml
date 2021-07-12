@@ -154,12 +154,12 @@
     BigIntGetExternalBalance    = 500
 
 [CryptoAPICost]
-    SHA256          = 600
-    Keccak256       = 600
-    Ripemd160       = 600
-    VerifyBLS       = 1000
-    VerifyEd25519   = 1000
-    VerifySecp256k1 = 1000
+    SHA256                 = 600
+    Keccak256              = 600
+    Ripemd160              = 600
+    VerifyBLS              = 1000
+    VerifyEd25519          = 1000
+    VerifySecp256k1        = 1000
 
 [WASMOpcodeCost]
     Unreachable = 1

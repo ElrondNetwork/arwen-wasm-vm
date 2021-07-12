@@ -20,6 +20,7 @@ int       bigIntCmp(bigInt op1, bigInt op2);
 
 int       bigIntIsInt64(bigInt reference);
 long long bigIntGetInt64(bigInt reference);
+long long bigIntGetOrCreateInt64(bigInt reference);
 void      bigIntSetInt64(bigInt destination, long long value);
 
 void      bigIntFinishUnsigned(bigInt reference);
