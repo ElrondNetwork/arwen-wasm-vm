@@ -1,0 +1,78 @@
+{
+    "name": "deploy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "address:oracle": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:price_aggregator"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../price-aggregator.wasm",
+                "value": "0",
+                "arguments": [
+                    "str:EGLD",
+                    "address:oracle",
+                    "1",
+                    "0",
+                    "0"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "sc:price_aggregator": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:payment_token": "str:EGLD",
+                        "str:query_payment_amount": "0",
+                        "str:submission_count": "1",
+                        "str:decimals": "0",
+                        "str:oracle_status.mapped|address:oracle": {
+                            "0-total_submissions": "u64:0",
+                            "1-accepted_submissions": "u64:0"
+                        },
+                        "+": ""
+                    },
+                    "code": "file:../price-aggregator.wasm"
+                },
+                "+": {}
+            }
+        }
+    ]
+}

@@ -66,6 +66,16 @@ func NewArwenTestExecutor() (*ArwenTestExecutor, error) {
 	}, nil
 }
 
+func NewArwenTestExecutorWithFileResolver(fileResolver *fr.FileResolver) (*ArwenTestExecutor, error) {
+	ae, err := NewArwenTestExecutor()
+	if err != nil {
+		return nil, err
+	}
+
+	ae.fileResolver = *fileResolver
+	return ae, nil
+}
+
 // GetVM yields a reference to the VMExecutionHandler used.
 func (ae *ArwenTestExecutor) GetVM() vmi.VMExecutionHandler {
 	return ae.vm

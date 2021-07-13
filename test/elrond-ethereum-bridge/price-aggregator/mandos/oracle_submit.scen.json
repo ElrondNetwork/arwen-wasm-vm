@@ -1,0 +1,32 @@
+{
+    "name": "oracle submit",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "deploy.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "oracle-submit",
+            "tx": {
+                "from": "address:oracle",
+                "to": "sc:price_aggregator",
+                "value": "0",
+                "function": "submit",
+                "arguments": [
+                    "str:GWEI",
+                    "str:EGLD",
+                    "10"
+                ],
+                "gasLimit": "40,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
