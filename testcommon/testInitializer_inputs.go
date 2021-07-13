@@ -18,7 +18,7 @@ import (
 	contextmock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/context"
 	worldmock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/world"
 	logger "github.com/ElrondNetwork/elrond-go-logger"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 	"github.com/stretchr/testify/require"
 )
 
@@ -502,8 +502,8 @@ func AddFinishData(vmOutput *vmcommon.VMOutput, data []byte) {
 	vmOutput.ReturnData = append(vmOutput.ReturnData, data)
 }
 
-// AddNewOutputAccount creates a new vmcommon.OutputAccount from the provided arguments and adds it to OutputAccounts of the provided vmOutput
-func AddNewOutputAccount(vmOutput *vmcommon.VMOutput, sender []byte, address []byte, balanceDelta int64, data []byte) *vmcommon.OutputAccount {
+// AddNewOutputTransfer creates a new vmcommon.OutputAccount from the provided arguments and adds it to OutputAccounts of the provided vmOutput
+func AddNewOutputTransfer(vmOutput *vmcommon.VMOutput, sender []byte, address []byte, balanceDelta int64, data []byte) *vmcommon.OutputAccount {
 	account := &vmcommon.OutputAccount{
 		Address:        address,
 		Nonce:          0,

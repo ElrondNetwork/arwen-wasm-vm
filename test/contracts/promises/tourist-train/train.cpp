@@ -14,7 +14,7 @@ extern "C"
         int successCallbackLen,
         byte *errorCallback,
         int errorCallbackLen,
-        unsigned long long gas
+        long long gas
     );
     int int64storageStore(byte *key, int keyLength, long long value);
     long long int64storageLoad(byte *key, int keyLength);

@@ -1,0 +1,76 @@
+{
+    "name": "one_async_call_success_cb",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "0x00000000000000000f0f706172656e7453432e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/parent-simple/output/parent-simple.wasm"
+                },
+                "0x00000000000000000f0f6368696c6453432e2e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/child-simple/output/child-simple.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "one_async_call_success_cb",
+            "tx": {
+                "from": "address:user",
+                "to": "0x00000000000000000f0f706172656e7453432e2e2e2e2e2e2e2e2e2e2e2e2e2e",
+                "value": "0",
+                "function": "one_async_call_success_cb",
+                "arguments": [],
+                "gasLimit": "0x1000000000000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "out": ["42"],
+                "status": "0",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "0x00000000000000000f0f706172656e7453432e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:SuccessCallbackArg|u8:0": "0",
+                        "str:SuccessCallbackArg|u8:1": "42",
+                        "str:CurrentStorageIndex": "2"
+                    },
+                    "code": "file:../../../../contracts/promises/parent-simple/output/parent-simple.wasm"
+                },
+                "0x00000000000000000f0f6368696c6453432e2e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/child-simple/output/child-simple.wasm"
+                }
+            }
+        }
+    ]
+}

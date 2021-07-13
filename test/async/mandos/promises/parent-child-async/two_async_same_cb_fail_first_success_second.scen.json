@@ -1,0 +1,78 @@
+{
+    "name": "two_async_same_cb_fail_first_success_second",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "0x00000000000000000f0f706172656e7453432e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/parent-simple/output/parent-simple.wasm"
+                },
+                "0x00000000000000000f0f6368696c6453432e2e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/child-simple/output/child-simple.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "two_async_same_cb_fail_first_success_second",
+            "tx": {
+                "from": "address:user",
+                "to": "0x00000000000000000f0f706172656e7453432e2e2e2e2e2e2e2e2e2e2e2e2e2e",
+                "value": "0",
+                "function": "two_async_same_cb_fail_first_success_second",
+                "arguments": [],
+                "gasLimit": "0x1000000000000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "out": ["0x02"],
+                "status": "0",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "0x00000000000000000f0f706172656e7453432e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:FailCallbackArg|u8:0": "4",
+                        "str:FailCallbackArg|u8:1": "str:fail",
+                        "str:SuccessCallbackArg|u8:2": "0",
+                        "str:SuccessCallbackArg|u8:3": "0x02",
+                        "str:CurrentStorageIndex": "4"
+                    },
+                    "code": "file:../../../../contracts/promises/parent-simple/output/parent-simple.wasm"
+                },
+                "0x00000000000000000f0f6368696c6453432e2e2e2e2e2e2e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/child-simple/output/child-simple.wasm"
+                }
+            }
+        }
+    ]
+}

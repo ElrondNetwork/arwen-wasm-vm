@@ -8,7 +8,7 @@ import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/config"
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/math"
 	contextmock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/context"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 	"github.com/stretchr/testify/require"
 )
 
@@ -295,14 +295,13 @@ func TestMeteringContext_GasUsed_NoStacking(t *testing.T) {
 func setUpStackOneLevel(t *testing.T, parentInput *vmcommon.ContractCallInput, childInput *vmcommon.ContractCallInput) (*contextmock.VMHostMock, *contextmock.RuntimeContextMock, uint64) {
 	t.Parallel()
 
-	mockRuntime := &contextmock.RuntimeContextMock{}
-
-	host := &contextmock.VMHostMock{
-		RuntimeContext: mockRuntime,
-	}
+	host := &contextmock.VMHostMock{}
 
 	contractSize := uint64(1000)
 	contract := make([]byte, contractSize)
+
+	mockRuntime := &contextmock.RuntimeContextMock{}
+	host.RuntimeContext = mockRuntime
 
 	mockRuntime.SCCodeSize = contractSize
 	mockRuntime.SCAddress = []byte("parent")
@@ -314,6 +313,9 @@ func setUpStackOneLevel(t *testing.T, parentInput *vmcommon.ContractCallInput, c
 	host.MeteringContext = metering
 	zeroCodeCosts(metering)
 
+	output, _ := NewOutputContext(host)
+	host.OutputContext = output
+
 	parentInput.GasProvided = 4000
 	host.MeteringContext.InitStateFromContractCallInput(&parentInput.VMInput)
 	_ = host.MeteringContext.DeductInitialGasForExecution(contract)
@@ -323,9 +325,8 @@ func setUpStackOneLevel(t *testing.T, parentInput *vmcommon.ContractCallInput, c
 }
 
 func initStateFromChildGetParentPointsBeforeStacking(t *testing.T, host *contextmock.VMHostMock, childInput *vmcommon.ContractCallInput) uint64 {
-
 	parentGasProvided := uint64(4000)
-	parentExecutionGas := uint64(1000) // this is the contract size, but I chose to keep the convention used on child
+	parentExecutionGas := uint64(1000)
 
 	require.Equal(t, parentGasProvided-parentExecutionGas, host.MeteringContext.GasLeft())
 
@@ -353,22 +354,20 @@ func initStateFromChildGetParentPointsBeforeStacking(t *testing.T, host *context
 }
 
 func TestMeteringContext_GasUsed_StackOneLevel(t *testing.T) {
-
-	parentExecutionGas := uint64(1000) // this is the contract size, but I chose to keep the convention used on child
+	parentExecutionGas := uint64(1000)
 	parentUsedGas := uint64(400)
-	parentInput := &vmcommon.ContractCallInput{
-		VMInput: vmcommon.VMInput{},
-	}
+	parentInput := &vmcommon.ContractCallInput{VMInput: vmcommon.VMInput{}}
+	parentInput.CallerAddr = []byte("user")
+	parentInput.RecipientAddr = []byte("parent")
 
 	childInput := &vmcommon.ContractCallInput{VMInput: vmcommon.VMInput{}}
 	childInput.GasProvided = 500
 	childInput.CallerAddr = parentInput.RecipientAddr
+	childInput.RecipientAddr = []byte("child")
 
 	host, mockRuntime, parentPointsBeforeStacking := setUpStackOneLevel(t, parentInput, childInput)
-
 	metering := host.MeteringContext
-	output, _ := NewOutputContext(host)
-	host.OutputContext = output
+	output := host.OutputContext
 
 	childExecutionGas := uint64(100)
 	_ = metering.DeductInitialGasForExecution(make([]byte, childExecutionGas))
@@ -382,7 +381,7 @@ func TestMeteringContext_GasUsed_StackOneLevel(t *testing.T) {
 	gasSpentByContract := metering.GasSpentByContract()
 	require.Equal(t, childExecutionGas+childUsedGas, gasSpentByContract)
 
-	_ = metering.UpdateGasStateOnSuccess(output.outputState)
+	_ = output.GetVMOutput()
 
 	// return to the parent
 	metering.PopMergeActiveState()
@@ -404,12 +403,12 @@ func TestMeteringContext_GasUsed_StackOneLevel(t *testing.T) {
 	gasSpentByContract = metering.GasSpentByContract()
 	require.Equal(t, parentExecutionGas+parentUsedGas+childExecutionGas+childUsedGas, gasSpentByContract)
 
-	_ = metering.UpdateGasStateOnSuccess(output.outputState)
+	vmOutput := output.GetVMOutput()
 
-	gasUsed := output.outputState.OutputAccounts["parent"].GasUsed
+	gasUsed := vmOutput.OutputAccounts["parent"].GasUsed
 	require.Equal(t, parentExecutionGas+parentUsedGas, gasUsed)
 
-	gasUsed = output.outputState.OutputAccounts["child"].GasUsed
+	gasUsed = vmOutput.OutputAccounts["child"].GasUsed
 	require.Equal(t, childExecutionGas+childUsedGas, gasUsed)
 
 	gasRemaining = math.SubUint64(parentInput.GasProvided, gasSpentByContract)

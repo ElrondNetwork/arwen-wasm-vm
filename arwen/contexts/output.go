@@ -483,6 +483,12 @@ func (context *outputContext) resolveReturnCodeFromError(err error) vmcommon.Ret
 	if errors.Is(err, arwen.ErrInvalidFunction) {
 		return vmcommon.UserError
 	}
+	if errors.Is(err, arwen.ErrInitFuncCalledInRun) {
+		return vmcommon.UserError
+	}
+	if errors.Is(err, arwen.ErrCallBackFuncCalledInRun) {
+		return vmcommon.UserError
+	}
 	if errors.Is(err, arwen.ErrNotEnoughGas) {
 		return vmcommon.OutOfGas
 	}

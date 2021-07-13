@@ -1,0 +1,33 @@
+{
+    "name": "setup accounts",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "0x00000000000000000f0f6669727374436f6e74726163742e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/three-contracts/first-contract/output/first-contract.wasm"
+                },
+                "0x00000000000000000f0f7365636f6e64436f6e74726163742e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/three-contracts/second-contract/output/second-contract.wasm"
+                },
+                "0x00000000000000000f0f7468697264436f6e74726163742e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/three-contracts/third-contract/output/third-contract.wasm"
+                }
+            }
+        }
+    ]
+}

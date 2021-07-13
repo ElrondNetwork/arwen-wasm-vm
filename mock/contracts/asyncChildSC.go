@@ -11,8 +11,7 @@ import (
 )
 
 // TransferToThirdPartyAsyncChildMock is an exposed mock contract method
-func TransferToThirdPartyAsyncChildMock(instanceMock *mock.InstanceMock, config interface{}) {
-	testConfig := config.(*AsyncCallTestConfig)
+func TransferToThirdPartyAsyncChildMock(instanceMock *mock.InstanceMock, testConfig *test.TestConfig) {
 	instanceMock.AddMockMethod("transferToThirdParty", func() *mock.InstanceMock {
 		host := instanceMock.Host
 		instance := mock.GetMockInstance(host)

@@ -113,6 +113,34 @@ var ErrBitwiseNegative = errors.New("bitwise operations only allowed on positive
 // ErrShiftNegative signals that an attempt to apply a bitwise shift operation on negative numbers has been made
 var ErrShiftNegative = errors.New("bitwise shift operations only allowed on positive integers and by a positive amount")
 
+var ErrAsyncCallGroupExistsAlready = errors.New("async call group exists already")
+
+var ErrAsyncCallGroupDoesNotExist = errors.New("async call group does not exist")
+
+var ErrAsyncCallGroupAlreadyComplete = errors.New("async call group already complete")
+
+var ErrOnlyOneAsyncCallAllowedToAddress = errors.New("only one async call allowed to an address")
+
+var ErrNilCallbackVMOutput = errors.New("nil callback VMOutput")
+
+var ErrAsyncCallNotFound = errors.New("async call not found")
+
+var ErrUnknownCallType = errors.New("unknown call type")
+
+var ErrCannotUseBuiltinAsCallback = errors.New("cannot use built-in function as callback")
+
+var ErrInvalidAsyncCallGroupID = errors.New("invalid async call group identifier")
+
+var ErrOnlyOneLegacyAsyncCallAllowed = errors.New("only one legacy async call allowed")
+
+var ErrLegacyAsyncCallNotFound = errors.New("legacy async call not found")
+
+var ErrLegacyAsyncCallInvalid = errors.New("legacy async call invalid")
+
+var ErrNoStoredAsyncContextFound = errors.New("no async context found in storage")
+
+var ErrCannotInterpretCallbackArgs = errors.New("cannot interpret callback args")
+
 // ErrAsyncContextDoesNotExist signals that the async context does not exist
 var ErrAsyncContextDoesNotExist = errors.New("async context does not exist")
 

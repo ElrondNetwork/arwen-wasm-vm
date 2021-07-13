@@ -193,12 +193,14 @@ func TestStorageContext_SetStorage(t *testing.T) {
 
 	key = []byte("RESERVEDkey")
 	value = []byte("doesn't matter")
-	_, err = storageContext.SetStorage(key, value)
+	storageStatus, err = storageContext.SetStorage(key, value)
+	require.Equal(t, arwen.StorageUnchanged, storageStatus)
 	require.Equal(t, arwen.ErrStoreElrondReservedKey, err)
 
 	key = []byte("RESERVED")
 	value = []byte("doesn't matter")
-	_, err = storageContext.SetStorage(key, value)
+	storageStatus, err = storageContext.SetStorage(key, value)
+	require.Equal(t, arwen.StorageUnchanged, storageStatus)
 	require.Equal(t, arwen.ErrStoreElrondReservedKey, err)
 }
 

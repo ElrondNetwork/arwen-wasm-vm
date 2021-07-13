@@ -29,10 +29,12 @@ type RuntimeContextMock struct {
 	FailElrondAPI          bool
 	FailElrondSyncExecAPI  bool
 	FailBigIntAPI          bool
-	AsyncCallInfo          *arwen.AsyncCallInfo
+	DefaultAsyncCall       *arwen.AsyncCall
 	RunningInstances       uint64
 	CurrentTxHash          []byte
 	OriginalTxHash         []byte
+	PrevTxHash             []byte
+	HasFunctionResult      bool
 }
 
 // InitState mocked method
@@ -196,8 +198,8 @@ func (r *RuntimeContextMock) GetRuntimeBreakpointValue() arwen.BreakpointValue {
 	return r.CurrentBreakpointValue
 }
 
-// ExecuteAsyncCall mocked method
-func (r *RuntimeContextMock) ExecuteAsyncCall(address []byte, data []byte, value []byte) error {
+// PrepareLegacyAsyncCall mocked method
+func (r *RuntimeContextMock) PrepareLegacyAsyncCall(address []byte, data []byte, value []byte) error {
 	return r.Err
 }
 
@@ -300,29 +302,9 @@ func (r *RuntimeContextMock) BigIntAPIErrorShouldFailExecution() bool {
 func (r *RuntimeContextMock) FailExecution(_ error) {
 }
 
-// GetAsyncCallInfo mocked method
-func (r *RuntimeContextMock) GetAsyncCallInfo() *arwen.AsyncCallInfo {
-	return r.AsyncCallInfo
-}
-
-// SetAsyncCallInfo mocked method
-func (r *RuntimeContextMock) SetAsyncCallInfo(asyncCallInfo *arwen.AsyncCallInfo) {
-	r.AsyncCallInfo = asyncCallInfo
-}
-
 // AddAsyncContextCall mocked method
 func (r *RuntimeContextMock) AddAsyncContextCall(_ []byte, _ *arwen.AsyncGeneratedCall) error {
 	return r.Err
-}
-
-// GetAsyncContextInfo mocked method
-func (r *RuntimeContextMock) GetAsyncContextInfo() *arwen.AsyncContextInfo {
-	return nil
-}
-
-// GetAsyncContext mocked method
-func (r *RuntimeContextMock) GetAsyncContext(_ []byte) (*arwen.AsyncContext, error) {
-	return nil, nil
 }
 
 // SetCustomCallFunction mocked method
@@ -340,5 +322,20 @@ func (r *RuntimeContextMock) AddError(err error, otherInfo ...string) {
 
 // GetAllErrors mocked method
 func (r *RuntimeContextMock) GetAllErrors() error {
+	return nil
+}
+
+// ValidateCallbackName mocked method
+func (r *RuntimeContextMock) ValidateCallbackName(callbackName string) error {
+	return nil
+}
+
+// HasFunction mocked method
+func (r *RuntimeContextMock) HasFunction(functionName string) bool {
+	return r.HasFunctionResult
+}
+
+// GetPrevTxHash mocked method
+func (r *RuntimeContextMock) GetPrevTxHash() []byte {
 	return nil
 }

@@ -7,17 +7,41 @@ import (
 	mock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/context"
 )
 
+// TestConfig is configuration for async call tests
+type TestConfig struct {
+	GasProvided        uint64
+	GasProvidedToChild uint64
+	GasUsedByParent    uint64
+	GasUsedByChild     uint64
+	GasUsedByCallback  uint64
+	GasLockCost        uint64
+
+	ParentBalance int64
+	ChildBalance  int64
+
+	TransferFromParentToChild int64
+	TransferToThirdParty      int64
+	TransferToVault           int64
+	TransferFromChildToParent int64
+
+	ESDTTokensToTransfer         uint64
+	CallbackESDTTokensToTransfer uint64
+
+	ChildCalls          int
+	RecursiveChildCalls int
+}
+
 type testSmartContract struct {
 	address []byte
 	balance int64
-	config  interface{}
+	config  *TestConfig
 	shardID uint32
 }
 
 // MockTestSmartContract represents the config data for the mock smart contract instance to be tested
 type MockTestSmartContract struct {
 	testSmartContract
-	initMethods []func(*mock.InstanceMock, interface{})
+	initMethods []func(*mock.InstanceMock, *TestConfig)
 }
 
 // CreateMockContract build a contract to be used in a test creted with BuildMockInstanceCallTest
@@ -41,14 +65,20 @@ func (mockSC *MockTestSmartContract) WithBalance(balance int64) *MockTestSmartCo
 	return mockSC
 }
 
+// WithShardID provides the shardID for the MockTestSmartContract
+func (mockSC *MockTestSmartContract) WithShardID(shardID uint32) *MockTestSmartContract {
+	mockSC.shardID = shardID
+	return mockSC
+}
+
 // WithConfig provides the config object for the MockTestSmartContract
-func (mockSC *MockTestSmartContract) WithConfig(config interface{}) *MockTestSmartContract {
+func (mockSC *MockTestSmartContract) WithConfig(config *TestConfig) *MockTestSmartContract {
 	mockSC.config = config
 	return mockSC
 }
 
 // WithMethods provides the methods for the MockTestSmartContract
-func (mockSC *MockTestSmartContract) WithMethods(initMethods ...func(*mock.InstanceMock, interface{})) MockTestSmartContract {
+func (mockSC *MockTestSmartContract) WithMethods(initMethods ...func(*mock.InstanceMock, *TestConfig)) MockTestSmartContract {
 	mockSC.initMethods = initMethods
 	return *mockSC
 }

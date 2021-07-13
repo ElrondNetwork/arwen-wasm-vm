@@ -17,7 +17,9 @@ type blockchainContext struct {
 	stateStack     []int
 }
 
-// NewBlockchainContext creates a new blockchainContext
+// NewAddress yields the address of a new SC account, when one such account is created.
+// The result should only depend on the creator address and nonce.
+// Returning an empty address lets the VM decide what the new address should be.
 func NewBlockchainContext(
 	host arwen.VMHost,
 	blockChainHook vmcommon.BlockchainHook,
@@ -31,9 +33,7 @@ func NewBlockchainContext(
 	return context, nil
 }
 
-// NewAddress yields the address of a new SC account, when one such account is created.
-// The result should only depend on the creator address and nonce.
-// Returning an empty address lets the VM decide what the new address should be.
+// NewAddress returns a new address created using the provided creator address and its nonce.
 func (context *blockchainContext) NewAddress(creatorAddress []byte) ([]byte, error) {
 	nonce, err := context.GetNonce(creatorAddress)
 	if err != nil {
@@ -49,7 +49,7 @@ func (context *blockchainContext) NewAddress(creatorAddress []byte) ([]byte, err
 	return context.blockChainHook.NewAddress(creatorAddress, nonce, vmType)
 }
 
-// AccountExists returns true if there is already an account at the given address
+// AccountExists verifies if the provided address exists.
 func (context *blockchainContext) AccountExists(address []byte) bool {
 	account, err := context.blockChainHook.GetUserAccount(address)
 	if err != nil {
@@ -61,12 +61,12 @@ func (context *blockchainContext) AccountExists(address []byte) bool {
 }
 
 // GetBalance returns the balance of the account at the given address as a byte array.
-// If there is no account at that address, big.NewInt(0).Bytes() will be returned
+// If there is no account at that address, big.NewInt(0).Bytes() will be returned.
 func (context *blockchainContext) GetBalance(address []byte) []byte {
 	return context.GetBalanceBigInt(address).Bytes()
 }
 
-// GetBalanceBigInt returns the balance of the account at the given address as a big int.
+// GetBalanceBigInt returns the balance of the account at the given address as a big.Int.
 // If there is no account at that address, 0 will be returned.
 func (context *blockchainContext) GetBalanceBigInt(address []byte) *big.Int {
 	outputAccount, isNew := context.host.Output().GetOutputAccount(address)
@@ -95,7 +95,7 @@ func (context *blockchainContext) GetBalanceBigInt(address []byte) *big.Int {
 	return balance
 }
 
-// GetNonce returns the nonce at which the account mapped to the given address is.
+// GetNonce retrieves the nonce of the account at the given address.
 func (context *blockchainContext) GetNonce(address []byte) (uint64, error) {
 	outputAccount, isNew := context.host.Output().GetOutputAccount(address)
 
@@ -115,7 +115,7 @@ func (context *blockchainContext) GetNonce(address []byte) (uint64, error) {
 	return nonce, nil
 }
 
-// IncreaseNonce increases the nonce of the account mapped to the given address by 1.
+// IncreaseNonce increments the nonce of the account at the given address.
 func (context *blockchainContext) IncreaseNonce(address []byte) {
 	nonce, _ := context.GetNonce(address)
 	outputAccount, _ := context.host.Output().GetOutputAccount(address)
@@ -127,7 +127,7 @@ func (context *blockchainContext) GetESDTToken(address []byte, tokenID []byte, n
 	return context.blockChainHook.GetESDTToken(address, tokenID, nonce)
 }
 
-// GetCodeHash returns the code hash that is set tho the given account
+// GetCodeHash retrieves the hash of the code stored under the given address.
 func (context *blockchainContext) GetCodeHash(address []byte) []byte {
 	account, err := context.blockChainHook.GetUserAccount(address)
 	if err != nil {
@@ -141,7 +141,7 @@ func (context *blockchainContext) GetCodeHash(address []byte) []byte {
 	return codeHash
 }
 
-// GetCode returns the code that is set tho the given account
+// GetCode retrieves the code stored under the given address.
 func (context *blockchainContext) GetCode(address []byte) ([]byte, error) {
 	outputAccount, isNew := context.host.Output().GetOutputAccount(address)
 	hasCode := !isNew && len(outputAccount.Code) > 0
@@ -167,7 +167,7 @@ func (context *blockchainContext) GetCode(address []byte) ([]byte, error) {
 	return code, nil
 }
 
-// GetCodeSize returns the size of the code that is set tho the given account.
+// GetCodeSize returns the size of the code stored under the given address.
 func (context *blockchainContext) GetCodeSize(address []byte) (int32, error) {
 	account, err := context.blockChainHook.GetUserAccount(address)
 	if err != nil || arwen.IfNil(account) {
@@ -179,13 +179,9 @@ func (context *blockchainContext) GetCodeSize(address []byte) (int32, error) {
 	return result, nil
 }
 
-// BlockHash returns the hash of the block that has the given nonce
-func (context *blockchainContext) BlockHash(number int64) []byte {
-	if number < 0 {
-		return nil
-	}
-
-	block, err := context.blockChainHook.GetBlockhash(uint64(number))
+// BlockHash returns the hash of the block that has the given nonce.
+func (context *blockchainContext) BlockHash(number uint64) []byte {
+	block, err := context.blockChainHook.GetBlockhash(number)
 	if err != nil {
 		return nil
 	}
@@ -193,62 +189,62 @@ func (context *blockchainContext) BlockHash(number int64) []byte {
 	return block
 }
 
-// CurrentEpoch returns the current epoch of the blockchain
+// CurrentEpoch returns the number of the current epoch.
 func (context *blockchainContext) CurrentEpoch() uint32 {
 	return context.blockChainHook.CurrentEpoch()
 }
 
-// CurrentNonce returns the current nonce of the blockchain
+// CurrentNonce returns the nonce of the block currently being built.
 func (context *blockchainContext) CurrentNonce() uint64 {
 	return context.blockChainHook.CurrentNonce()
 }
 
-// GetStateRootHash returns the current state root hash
+// GetStateRootHash returns the root hash of the entire state.
 func (context *blockchainContext) GetStateRootHash() []byte {
 	return context.blockChainHook.GetStateRootHash()
 }
 
-// LastTimeStamp returns the timeStamp from the last committed block
+// LastTimeStamp returns the timestamp of the last commited block
 func (context *blockchainContext) LastTimeStamp() uint64 {
 	return context.blockChainHook.LastTimeStamp()
 }
 
-// LastNonce returns the nonce from from the last committed block
+// LastNonce returns the nonce of the last commited block.
 func (context *blockchainContext) LastNonce() uint64 {
 	return context.blockChainHook.LastNonce()
 }
 
-// LastRound returns the round from the last committed block
+// LastRound returns the round of the last commited block.
 func (context *blockchainContext) LastRound() uint64 {
 	return context.blockChainHook.LastRound()
 }
 
-// LastEpoch returns the epoch from the last committed block
+// LastEpoch returns the epoch number of the last commited block.
 func (context *blockchainContext) LastEpoch() uint32 {
 	return context.blockChainHook.LastEpoch()
 }
 
-// CurrentRound returns the round from the current block
+// CurrentRound returns the round of the block currently being built.
 func (context *blockchainContext) CurrentRound() uint64 {
 	return context.blockChainHook.CurrentRound()
 }
 
-// CurrentTimeStamp return the timestamp from the current block
+// CurrentTimeStamp returns the timestamp of the block currently being built.
 func (context *blockchainContext) CurrentTimeStamp() uint64 {
 	return context.blockChainHook.CurrentTimeStamp()
 }
 
-// LastRandomSeed returns the random seed from the last committed block
+// LastRandomSeed returns the randomness seed of the last commited block.
 func (context *blockchainContext) LastRandomSeed() []byte {
 	return context.blockChainHook.LastRandomSeed()
 }
 
-// CurrentRandomSeed returns the random seed from the current header
+// CurrentRandomSeed returns the random seed from header of the block being built.
 func (context *blockchainContext) CurrentRandomSeed() []byte {
 	return context.blockChainHook.CurrentRandomSeed()
 }
 
-// GetOwnerAddress returns the address of the owner of the SC that is set in the runtime context
+// GetOwnerAddress returns the owner address of the contract being executed.
 func (context *blockchainContext) GetOwnerAddress() ([]byte, error) {
 	scAddress := context.host.Runtime().GetSCAddress()
 	scAccount, err := context.blockChainHook.GetUserAccount(scAddress)
@@ -259,27 +255,27 @@ func (context *blockchainContext) GetOwnerAddress() ([]byte, error) {
 	return scAccount.GetOwnerAddress(), nil
 }
 
-// GetShardOfAddress returns the shard in which the address is present.
+// GetShardOfAddress returns the number of the shard containing the given address.
 func (context *blockchainContext) GetShardOfAddress(addr []byte) uint32 {
 	return context.blockChainHook.GetShardOfAddress(addr)
 }
 
-// IsSmartContract returns true if the current address is the address of a SC.
+// IsSmartContract verifies whether the provided address is a smart contract or not.
 func (context *blockchainContext) IsSmartContract(addr []byte) bool {
 	return context.blockChainHook.IsSmartContract(addr)
 }
 
-// IsPayable returns true if the SC at the given address is payable
+// IsPayable verifies whether the provided address is payable or not.
 func (context *blockchainContext) IsPayable(addr []byte) (bool, error) {
 	return context.blockChainHook.IsPayable(addr)
 }
 
-// SaveCompiledCode saves the compiled code to cache and storage.
+// SaveCompiledCode stores the provided precompiled binary code under the specified hash.
 func (context *blockchainContext) SaveCompiledCode(codeHash []byte, code []byte) {
 	context.blockChainHook.SaveCompiledCode(codeHash, code)
 }
 
-// GetCompiledCode returns the compiled code if it finds in the cache or storage
+// GetCompiledCode retrieves the precompiled binary code stored under the specified hash.
 func (context *blockchainContext) GetCompiledCode(codeHash []byte) (bool, []byte) {
 	return context.blockChainHook.GetCompiledCode(codeHash)
 }

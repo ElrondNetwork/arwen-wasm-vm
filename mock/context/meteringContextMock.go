@@ -13,6 +13,7 @@ type MeteringContextMock struct {
 	GasCost           *config.GasCost
 	GasLeftMock       uint64
 	GasLockedMock     uint64
+	GasProvidedMock   uint64
 	GasComputedToLock uint64
 	BlockGasLimitMock uint64
 	Err               error

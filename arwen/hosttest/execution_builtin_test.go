@@ -224,13 +224,11 @@ func TestESDT_GettersAPI_ExecuteAfterBuiltinCall(t *testing.T) {
 		[]byte("validateGetters"),
 	}
 
-	vmOutput, asyncInfo, err := host.ExecuteOnDestContext(input)
+	vmOutput, err := host.ExecuteOnDestContext(input)
 
 	verify := test.NewVMOutputVerifier(t, vmOutput, err)
 	verify.
 		Ok()
-
-	require.Zero(t, len(asyncInfo.AsyncContextMap))
 
 	parentESDTBalance, _ := parentAccount.GetTokenBalanceUint64(test.ESDTTestTokenKey)
 	require.Equal(t, initialESDTTokenBalance-uint64(esdtValue), parentESDTBalance)

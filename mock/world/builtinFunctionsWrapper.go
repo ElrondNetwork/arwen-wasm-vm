@@ -2,7 +2,7 @@ package worldmock
 
 import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/config"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 	"github.com/ElrondNetwork/elrond-vm-common/builtInFunctions"
 )
 
@@ -63,8 +63,11 @@ func NewBuiltinFunctionsWrapper(
 // ProcessBuiltInFunction delegates the execution of a real builtin function to
 // the inner BuiltInFunctionContainer.
 func (bf *BuiltinFunctionsWrapper) ProcessBuiltInFunction(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, error) {
-	caller := bf.getAccountSharded(input.CallerAddr)
-	recipient := bf.getAccountSharded(input.RecipientAddr)
+	// TODO matei-p Is this necessary? cross shard checks are already made when this is called
+	// caller := bf.getAccountSharded(input.CallerAddr)
+	// recipient := bf.getAccountSharded(input.RecipientAddr)
+	caller := bf.World.AcctMap.GetAccount(input.CallerAddr)
+	recipient := bf.World.AcctMap.GetAccount(input.RecipientAddr)
 
 	function, err := bf.Container.Get(input.Function)
 	if err != nil {

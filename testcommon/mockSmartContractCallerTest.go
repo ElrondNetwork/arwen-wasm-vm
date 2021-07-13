@@ -6,7 +6,7 @@ import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/arwen"
 	mock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/context"
 	worldmock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/world"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 )
 
 type testTemplateConfig struct {
@@ -82,6 +82,17 @@ func SimpleWasteGasMockMethod(instanceMock *mock.InstanceMock, gas uint64) func(
 	return func() *mock.InstanceMock {
 		host := instanceMock.Host
 		host.Metering().UseGas(gas)
+		instance := mock.GetMockInstance(host)
+		return instance
+	}
+}
+
+// WasteGasWithReturnDataMockMethod is a simple waste gas mock method
+func WasteGasWithReturnDataMockMethod(instanceMock *mock.InstanceMock, gas uint64, returnData []byte) func() *mock.InstanceMock {
+	return func() *mock.InstanceMock {
+		host := instanceMock.Host
+		host.Metering().UseGas(gas)
+		host.Output().Finish(returnData)
 		instance := mock.GetMockInstance(host)
 		return instance
 	}

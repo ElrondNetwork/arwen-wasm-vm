@@ -1,0 +1,72 @@
+{
+    "name": "First contract -> second contract -> calls third contract twice with 'answer'",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "setup_accounts.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "call first contract - call_third_contract_twice endpoint",
+            "comment": "first calls second, which calls third contract twice for 'answer'",
+            "tx": {
+                "from": "address:user",
+                "to": "0x00000000000000000f0f6669727374436f6e74726163742e2e2e2e2e2e2e2e2e",
+                "value": "0",
+                "function": "call_second_contract",
+                "arguments": [
+                    "str:call_third_contract_twice_simple"
+                ],
+                "gasLimit": "0x1000000000000",
+                "gasPrice": "0x00"
+            },
+            "expect": {
+                "out": ["42", "42"],
+                "status": "0",
+                "message": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                },
+                "0x00000000000000000f0f6669727374436f6e74726163742e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:SuccessCallbackArg|u8:0": "0",
+                        "str:SuccessCallbackArg|u8:1": "42",
+                        "str:SuccessCallbackArg|u8:2": "42",
+                        "str:CurrentStorageIndex": "3"
+                    },
+                    "code": "file:../../../../contracts/promises/three-contracts/first-contract/output/first-contract.wasm"
+                },
+                "0x00000000000000000f0f7365636f6e64436f6e74726163742e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:SuccessCallbackArg|u8:0": "0",
+                        "str:SuccessCallbackArg|u8:1": "42",
+                        "str:SuccessCallbackArg|u8:2": "0",
+                        "str:SuccessCallbackArg|u8:3": "42",
+                        "str:CurrentStorageIndex": "4"
+                    },
+                    "code": "file:../../../../contracts/promises/three-contracts/second-contract/output/second-contract.wasm"
+                },
+                "0x00000000000000000f0f7468697264436f6e74726163742e2e2e2e2e2e2e2e2e": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../../../contracts/promises/three-contracts/third-contract/output/third-contract.wasm"
+                }
+            }
+        }
+    ]
+}

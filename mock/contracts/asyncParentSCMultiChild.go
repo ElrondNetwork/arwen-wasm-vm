@@ -3,6 +3,7 @@ package contracts
 import (
 	"math/big"
 
+	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/arwen"
 	mock "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/mock/context"
 	test "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/testcommon"
 	"github.com/ElrondNetwork/elrond-vm-common/txDataBuilder"
@@ -10,8 +11,7 @@ import (
 )
 
 // ForwardAsyncCallMultiChildMock is an exposed mock contract method
-func ForwardAsyncCallMultiChildMock(instanceMock *mock.InstanceMock, config interface{}) {
-	testConfig := config.(*AsyncCallMultiChildTestConfig)
+func ForwardAsyncCallMultiChildMock(instanceMock *mock.InstanceMock, testConfig *test.TestConfig) {
 	instanceMock.AddMockMethod("forwardAsyncCall", func() *mock.InstanceMock {
 		host := instanceMock.Host
 		instance := mock.GetMockInstance(host)
@@ -28,8 +28,19 @@ func ForwardAsyncCallMultiChildMock(instanceMock *mock.InstanceMock, config inte
 			callData.Func(function)
 			// recursiveChildCalls
 			callData.BigInt(big.NewInt(1))
+			// child will return this
+			callData.BigInt(big.NewInt(int64(childCall)))
 
-			err := host.Runtime().ExecuteAsyncCall(destination, callData.ToBytes(), value)
+			async := host.Async()
+			err := async.RegisterAsyncCall("myAsyncGroup", &arwen.AsyncCall{
+				Status:          arwen.AsyncCallPending,
+				Destination:     destination,
+				Data:            callData.ToBytes(),
+				ValueBytes:      value,
+				GasLimit:        uint64(300),
+				SuccessCallback: "callBack",
+				ErrorCallback:   "callBack",
+			})
 			require.Nil(t, err)
 		}
 
@@ -39,7 +50,6 @@ func ForwardAsyncCallMultiChildMock(instanceMock *mock.InstanceMock, config inte
 }
 
 // CallBackMultiChildMock is an exposed mock contract method
-func CallBackMultiChildMock(instanceMock *mock.InstanceMock, config interface{}) {
-	testConfig := config.(*AsyncCallMultiChildTestConfig)
+func CallBackMultiChildMock(instanceMock *mock.InstanceMock, testConfig *test.TestConfig) {
 	instanceMock.AddMockMethod("callBack", test.SimpleWasteGasMockMethod(instanceMock, testConfig.GasUsedByCallback))
 }

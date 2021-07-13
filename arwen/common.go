@@ -2,7 +2,7 @@ package arwen
 
 import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/config"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 )
 
 const ArwenVersion = "v1.3"
@@ -31,9 +31,9 @@ const (
 type AsyncCallExecutionMode uint
 
 const (
-	// SyncCall indicates that the async call can be executed synchronously,
+	// SyncExecution indicates that the async call can be executed synchronously,
 	// with its corresponding callback
-	SyncCall AsyncCallExecutionMode = iota
+	SyncExecution AsyncCallExecutionMode = iota
 
 	// AsyncBuiltinFuncIntraShard indicates that the async call is an intra-shard built in function call
 	AsyncBuiltinFuncIntraShard
@@ -67,6 +67,10 @@ const AsyncDataPrefix = ProtectedStoragePrefix + "ASYNC"
 
 // AsyncCallStatus represents the different status an async call can have
 type AsyncCallStatus uint8
+
+// LegacyAsyncCallGroupID is the AsyncCallGroup identifier reserved for the
+// implementation of the legacy asyncCall() EEI function
+const LegacyAsyncCallGroupID = "LegacyAsync"
 
 const (
 	// AsyncCallPending is the status of an async call that awaits complete execution
@@ -169,19 +173,11 @@ type AsyncGeneratedCall struct {
 	ProvidedGas     uint64
 }
 
-// AsyncContext is a structure containing a group of async calls and a callback
+// OldAsyncContext is a structure containing a group of async calls and a callback
 //  that should be called when all these async calls are resolved
-type AsyncContext struct {
+type OldAsyncContext struct {
 	Callback   string
 	AsyncCalls []*AsyncGeneratedCall
-}
-
-// AsyncContextInfo is the structure resulting after a smart contract call that has initiated
-// one or more async calls. It will
-type AsyncContextInfo struct {
-	CallerAddr      []byte
-	ReturnData      []byte
-	AsyncContextMap map[string]*AsyncContext
 }
 
 // GetDestination returns the destination of an async call

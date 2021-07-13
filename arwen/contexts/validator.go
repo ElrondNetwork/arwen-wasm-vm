@@ -2,7 +2,7 @@ package contexts
 
 import (
 	"fmt"
-	"unicode"
+	"strings"
 
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/arwen"
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/wasmer"
@@ -10,6 +10,7 @@ import (
 )
 
 const noArity = -1
+const allowedCharsInFunctionName = "abcdefghijklmnopqrstuvwxyz0123456789_"
 
 // wasmValidator is a validator for WASM SmartContracts
 type wasmValidator struct {
@@ -92,7 +93,10 @@ func (validator *wasmValidator) verifyValidFunctionName(functionName string) err
 	if len(functionName) >= maxLengthOfFunctionName {
 		return errInvalidName
 	}
-	if !isASCIIString(functionName) {
+	if functionName[0] >= '0' && functionName[0] <= '9' {
+		return errInvalidName
+	}
+	if !validCharactersOnly(functionName) {
 		return errInvalidName
 	}
 	if validator.reserved.IsReserved(functionName) {
@@ -102,10 +106,11 @@ func (validator *wasmValidator) verifyValidFunctionName(functionName string) err
 	return nil
 }
 
-// TODO: Add more constraints (too loose currently)
-func isASCIIString(input string) bool {
+func validCharactersOnly(input string) bool {
+	input = strings.ToLower(input)
 	for i := 0; i < len(input); i++ {
-		if input[i] > unicode.MaxASCII {
+		c := strings.ToLower(string(input[i]))
+		if !strings.Contains(allowedCharsInFunctionName, c) {
 			return false
 		}
 	}

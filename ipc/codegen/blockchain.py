@@ -97,8 +97,8 @@ def generate_messages(args):
 
     print("""
         import (        
-        \"github.com/ElrondNetwork/elrond-go/core/vmcommon\"
-        \"github.com/ElrondNetwork/elrond-go/data/esdt\"
+        \"github.com/ElrondNetwork/elrond-vm-common\"
+        \"github.com/ElrondNetwork/elrond-vm-common/data/esdt\"
         )
 	""")
 
@@ -191,7 +191,7 @@ def generate_repliers(args):
     	import (
 	    \"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/ipc/common\"
         \"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/arwen\"
-	    \"github.com/ElrondNetwork/elrond-go/data/esdt\"
+	    \"github.com/ElrondNetwork/elrond-vm-common/data/esdt\"
 	)
 	""")
 
@@ -265,10 +265,10 @@ def generate_gateway(args):
     print("""
 
 import (
-    "github.com/ElrondNetwork/elrond-go/data/esdt"
+    "github.com/ElrondNetwork/elrond-vm-common/data/esdt"
 
     "github.com/ElrondNetwork/arwen-wasm-vm/v1_3/ipc/common"
-    "github.com/ElrondNetwork/elrond-go/core/vmcommon"
+    "github.com/ElrondNetwork/elrond-vm-common"
 )
 
 var _ vmcommon.BlockchainHook = (*BlockchainHookGateway)(nil)

@@ -6,7 +6,7 @@ import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/config"
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/crypto"
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/wasmer"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 	"github.com/ElrondNetwork/elrond-vm-common/data/esdt"
 )
 
@@ -31,6 +31,7 @@ type VMHost interface {
 	Crypto() crypto.VMCrypto
 	Blockchain() BlockchainContext
 	Runtime() RuntimeContext
+	Async() AsyncContext
 	BigInt() BigIntContext
 	Output() OutputContext
 	Metering() MeteringContext
@@ -43,8 +44,8 @@ type VMHost interface {
 
 	ExecuteESDTTransfer(destination []byte, sender []byte, tokenIdentifier []byte, nonce uint64, value *big.Int, callType vmcommon.CallType) (*vmcommon.VMOutput, uint64, error)
 	CreateNewContract(input *vmcommon.ContractCreateInput) ([]byte, error)
-	ExecuteOnSameContext(input *vmcommon.ContractCallInput) (*AsyncContextInfo, error)
-	ExecuteOnDestContext(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, *AsyncContextInfo, error)
+	ExecuteOnSameContext(input *vmcommon.ContractCallInput) error
+	ExecuteOnDestContext(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, error)
 	GetAPIMethods() *wasmer.Imports
 	GetProtocolBuiltinFunctions() vmcommon.FunctionNames
 	SetProtocolBuiltinFunctions(vmcommon.FunctionNames)
@@ -52,8 +53,10 @@ type VMHost interface {
 	AreInSameShard(leftAddress []byte, rightAddress []byte) bool
 
 	GetGasScheduleMap() config.GasScheduleMap
-	GetContexts() (BigIntContext, BlockchainContext, MeteringContext, OutputContext, RuntimeContext, StorageContext)
+	GetContexts() (BigIntContext, BlockchainContext, MeteringContext, OutputContext, RuntimeContext, AsyncContext, StorageContext)
 	SetRuntimeContext(runtime RuntimeContext)
+
+	CallArgsParser() CallArgsParser
 
 	InitState()
 }
@@ -82,7 +85,7 @@ type BlockchainContext interface {
 	GetCodeHash(addr []byte) []byte
 	GetCode(addr []byte) ([]byte, error)
 	GetCodeSize(addr []byte) (int32, error)
-	BlockHash(number int64) []byte
+	BlockHash(number uint64) []byte
 	GetOwnerAddress() ([]byte, error)
 	GetShardOfAddress(addr []byte) uint32
 	IsSmartContract(addr []byte) bool
@@ -120,11 +123,6 @@ type RuntimeContext interface {
 	SetRuntimeBreakpointValue(value BreakpointValue)
 	GetRuntimeBreakpointValue() BreakpointValue
 	IsContractOnTheStack(address []byte) bool
-	GetAsyncCallInfo() *AsyncCallInfo
-	SetAsyncCallInfo(asyncCallInfo *AsyncCallInfo)
-	AddAsyncContextCall(contextIdentifier []byte, asyncCall *AsyncGeneratedCall) error
-	GetAsyncContextInfo() *AsyncContextInfo
-	GetAsyncContext(contextIdentifier []byte) (*AsyncContext, error)
 	RunningInstancesCount() uint64
 	IsFunctionImported(name string) bool
 	IsWarmInstance() bool
@@ -148,10 +146,13 @@ type RuntimeContext interface {
 	ElrondSyncExecAPIErrorShouldFailExecution() bool
 	CryptoAPIErrorShouldFailExecution() bool
 	BigIntAPIErrorShouldFailExecution() bool
-	ExecuteAsyncCall(address []byte, data []byte, value []byte) error
 
 	AddError(err error, otherInfo ...string)
 	GetAllErrors() error
+
+	ValidateCallbackName(callbackName string) error
+	HasFunction(functionName string) bool
+	GetPrevTxHash() []byte
 
 	// TODO remove after implementing proper mocking of Wasmer instances; this is
 	// used for tests only
@@ -273,4 +274,30 @@ type AsyncCallInfoHandler interface {
 type InstanceBuilder interface {
 	NewInstanceWithOptions(contractCode []byte, options wasmer.CompilationOptions) (wasmer.InstanceHandler, error)
 	NewInstanceFromCompiledCodeWithOptions(compiledCode []byte, options wasmer.CompilationOptions) (wasmer.InstanceHandler, error)
+}
+
+type AsyncContext interface {
+	StateStack
+
+	InitStateFromInput(input *vmcommon.ContractCallInput)
+	HasPendingCallGroups() bool
+	IsComplete() bool
+	GetCallGroup(groupID string) (*AsyncCallGroup, bool)
+	SetGroupCallback(groupID string, callbackName string, data []byte, gas uint64) error
+	SetContextCallback(callbackName string, data []byte, gas uint64) error
+	HasCallback() bool
+	PostprocessCrossShardCallback() error
+	GetCallerAddress() []byte
+	GetReturnData() []byte
+	SetReturnData(data []byte)
+	GetGasPrice() uint64
+
+	Execute() error
+	RegisterAsyncCall(groupID string, call *AsyncCall) error
+	RegisterLegacyAsyncCall(address []byte, data []byte, value []byte) error
+	UpdateCurrentCallStatus() (*AsyncCall, error)
+
+	Load() error
+	Save() error
+	Delete() error
 }

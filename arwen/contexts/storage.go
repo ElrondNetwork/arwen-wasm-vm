@@ -8,7 +8,7 @@ import (
 	"github.com/ElrondNetwork/arwen-wasm-vm/v1_3/math"
 	logger "github.com/ElrondNetwork/elrond-go-logger"
 	"github.com/ElrondNetwork/elrond-go-logger/check"
-	"github.com/ElrondNetwork/elrond-vm-common"
+	vmcommon "github.com/ElrondNetwork/elrond-vm-common"
 )
 
 var logStorage = logger.GetOrCreate("arwen/storage")
@@ -190,7 +190,8 @@ func (context *storageContext) isArwenProtectedKey(key []byte) bool {
 }
 
 func (context *storageContext) isElrondReservedKey(key []byte) bool {
-	return bytes.HasPrefix(key, context.elrondProtectedKeyPrefix)
+	prefixElrond := bytes.HasPrefix(key, context.elrondProtectedKeyPrefix)
+	return prefixElrond
 }
 
 func (context *storageContext) SetProtectedStorage(key []byte, value []byte) (arwen.StorageStatus, error) {
